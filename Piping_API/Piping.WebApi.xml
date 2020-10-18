@@ -1,0 +1,322 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Piping.WebApi</name>
+    </assembly>
+    <members>
+        <member name="T:Piping.WebApi.Controllers.COFController">
+            <summary>
+            COF - Frammable, Toxic, NTNF
+            </summary>
+        </member>
+        <member name="M:Piping.WebApi.Controllers.COFController.#ctor(Piping.Interfaces.Managers.ICOFManager,AutoMapper.IMapper,Microsoft.Extensions.Logging.ILogger{Piping.WebApi.Controllers.COFController})">
+            <summary>
+            COF Constructor
+            </summary>
+        </member>
+        <member name="M:Piping.WebApi.Controllers.COFController.GetAll">
+            <summary>
+            Get All COF
+            </summary>
+            <returns>200 - Successfully get All COF</returns>
+            <returns>500 - Exception</returns>        
+        </member>
+        <member name="M:Piping.WebApi.Controllers.COFController.Get(System.Int32)">
+            <summary>
+            Get COF by ID
+            </summary>
+            <param name="ID">The ID of the COF</param>
+            <returns>200 - Successfully get COF</returns>
+            <returns>500 - Exception</returns>  
+        </member>
+        <member name="M:Piping.WebApi.Controllers.COFController.GetByEquipmentNo(System.String)">
+            <summary>
+            Get COF by EquipmentNo
+            </summary>
+            <param name="equipmentNo">EquipmentNo</param>
+            <returns>200 - Successfully get COF</returns>
+            <returns>500 - Exception</returns>  
+        </member>
+        <member name="M:Piping.WebApi.Controllers.COFController.Post(Piping.DTO.COFFlammableDTO)">
+            <summary>
+            Create new COF
+            </summary>
+            <param name="cofFlammableDTO">COF</param>
+            <returns>200 - COF created successfully</returns>
+            <returns>500 - Exception</returns>  
+        </member>
+        <member name="M:Piping.WebApi.Controllers.COFController.Update(Piping.DTO.COFFlammableDTO)">
+            <summary>
+            Update COF
+            </summary>
+            <param name="cofFlammableDTO">COF</param>
+            <returns>200 - COF updated successfully</returns>
+            <returns>500 - Exception</returns>  
+        </member>
+        <member name="T:Piping.WebApi.Controllers.CompanyController">
+            <summary>
+            Company - Name, Logo, Address
+            </summary>
+        </member>
+        <member name="M:Piping.WebApi.Controllers.CompanyController.#ctor(Piping.Interfaces.Managers.ICompanyManager,AutoMapper.IMapper,Microsoft.Extensions.Logging.ILogger{Piping.WebApi.Controllers.CompanyController})">
+            <summary>
+            Company Constructor
+            </summary>
+        </member>
+        <member name="M:Piping.WebApi.Controllers.CompanyController.GetAll">
+            <summary>
+            Get All Companies
+            </summary>
+            <returns>200 - Successfully get All Companies</returns>
+            <returns>500 - Exception</returns>        
+        </member>
+        <member name="M:Piping.WebApi.Controllers.CompanyController.Get(System.Int32)">
+            <summary>
+            Get Company by ID
+            </summary>
+            <param name="ID">The ID of the Company</param>
+            <returns>200 - Successfully get Company</returns>
+            <returns>500 - Exception</returns>  
+        </member>
+        <member name="M:Piping.WebApi.Controllers.CompanyController.Post(Piping.DTO.CompanyRequestDTO)">
+            <summary>
+            Create new Company
+            </summary>
+            <param name="companyRequestDTO">Company Name, Logo, Address, Email</param>
+            <returns>200 - Company created successfully</returns>
+            <returns>500 - Exception</returns>  
+        </member>
+        <member name="M:Piping.WebApi.Controllers.CompanyController.Put(Piping.DTO.CompanyRequestDTO)">
+            <summary>
+            Update Company
+            </summary>
+            <param name="companyRequestDTO">Company Name, Logo, Address, Email</param>
+            <returns>200 - Company updated successfully</returns>
+            <returns>500 - Exception</returns>  
+        </member>
+        <member name="T:Piping.WebApi.Controllers.CorrosionStudyController">
+            <summary>
+            Corrosion Study
+            </summary>
+        </member>
+        <member name="M:Piping.WebApi.Controllers.CorrosionStudyController.#ctor(Piping.Interfaces.Managers.ICorrosionStudyManager,AutoMapper.IMapper,Microsoft.Extensions.Logging.ILogger{Piping.WebApi.Controllers.CorrosionStudyController})">
+            <summary>
+            CorrosionStudy Constructor
+            </summary>
+        </member>
+        <member name="M:Piping.WebApi.Controllers.CorrosionStudyController.GetAll">
+            <summary>
+            Get All CorrosionStudy
+            </summary>
+            <returns>200 - Successfully get All CorrosionStudy</returns>
+            <returns>500 - Exception</returns>  
+        </member>
+        <member name="M:Piping.WebApi.Controllers.CorrosionStudyController.GetBySearchFilters(Piping.DTO.CorrosionStudyFilterDTO)">
+            <summary>
+            Get CorrosionStudy By Filter
+            </summary>
+            <param name="corrosionStudyFilterDTO">Filters</param>
+            <returns>200 - Successfully get All CorrosionStudy</returns>
+            <returns>500 - Exception</returns>  
+        </member>
+        <member name="M:Piping.WebApi.Controllers.InsulationTypeController.GetDropdownList">
+            <summary>
+            Gets the dropdown values.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Piping.WebApi.Controllers.MaterialCodesController.GetDropdownList">
+            <summary>
+            Gets the Material Code list for dropdown values.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Piping.WebApi.Controllers.MaterialMasterController.GetMaterialStdDropdownList">
+            <summary>
+            Gets the Material Std list for dropdown values.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Piping.WebApi.Controllers.MaterialMasterController.GetMaterialGradeDropdownList">
+            <summary>
+            Gets the Material Grade list for dropdown values.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Piping.WebApi.Controllers.MenuController">
+            <summary>
+            Menu
+            </summary>
+        </member>
+        <member name="M:Piping.WebApi.Controllers.MenuController.#ctor(Piping.Interfaces.Managers.IMenuManager,AutoMapper.IMapper,Microsoft.Extensions.Logging.ILogger{Piping.WebApi.Controllers.MenuController},Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Menu Constructor
+            </summary>
+        </member>
+        <member name="T:Piping.WebApi.Controllers.PlantController">
+            <summary>
+            Plant - Code, Name, ParentPlant
+            </summary>
+        </member>
+        <member name="M:Piping.WebApi.Controllers.PlantController.#ctor(Piping.Interfaces.Managers.IPlantManager,AutoMapper.IMapper,Microsoft.Extensions.Logging.ILogger{Piping.WebApi.Controllers.PlantController})">
+            <summary>
+            Plant Constructor
+            </summary>
+        </member>
+        <member name="M:Piping.WebApi.Controllers.PlantController.GetAll">
+            <summary>
+            Get All Plants
+            </summary>
+            <returns>200 - Successfully get all Plants</returns>
+            <returns>500 - Exception</returns>        
+        </member>
+        <member name="M:Piping.WebApi.Controllers.PlantController.Get(System.Int32)">
+            <summary>
+            Get Plant by ID
+            </summary>
+            <param name="ID">The ID of the Plant</param>
+            <returns>200 - Successfully get Plant</returns>
+            <returns>500 - Exception</returns>  
+        </member>
+        <member name="M:Piping.WebApi.Controllers.PlantController.Post(Piping.DTO.PlantRequestDTO)">
+            <summary>
+            Create new Plant
+            </summary>
+            <param name="plantRequestDTO">Plant Name, ParentPlant</param>
+            <returns>200 - Plant created successfully</returns>
+            <returns>500 - Exception</returns>  
+        </member>
+        <member name="M:Piping.WebApi.Controllers.PlantController.Update(Piping.DTO.PlantRequestDTO)">
+            <summary>
+            Update Plant
+            </summary>
+            <param name="plantRequestDTO">Plant Name, ParentPlant</param>
+            <returns>200 - Plant updated successfully</returns>
+            <returns>500 - Exception</returns>  
+        </member>
+        <member name="T:Piping.WebApi.Controllers.RiskAnalysisController">
+            <summary>
+            What IF Risk Analysis - Driving vs Projected Risk
+            </summary>
+        </member>
+        <member name="M:Piping.WebApi.Controllers.RiskAnalysisController.#ctor(Piping.Interfaces.Managers.IRiskAnalysisManager,AutoMapper.IMapper,Microsoft.Extensions.Logging.ILogger{Piping.WebApi.Controllers.RiskAnalysisController})">
+            <summary>
+            RiskAnalysis Constructor
+            </summary>
+        </member>
+        <member name="M:Piping.WebApi.Controllers.RiskAnalysisController.GetCurrentRiskMatrix(Piping.DTO.RiskAnalysisFilterDTO)">
+            <summary>
+            Get driving Risk matrix
+            </summary>
+            <param name="filter">Left Menu selection</param>
+            <returns>200 - Successfully got driving Risk matrix</returns>
+            <returns>500 - Exception</returns> 
+        </member>
+        <member name="M:Piping.WebApi.Controllers.RiskAnalysisController.GetCurrentRiskChart(Piping.DTO.RiskAnalysisFilterDTO)">
+            <summary>
+            Get driving Risk chart
+            </summary>
+            <param name="filter">Left Menu selection</param>
+            <returns>200 - Successfully got driving Risk chart</returns>
+            <returns>500 - Exception</returns>  
+        </member>
+        <member name="M:Piping.WebApi.Controllers.RiskAnalysisController.GetCurrentRiskSheet(Piping.DTO.RiskAnalysisFilterDTO)">
+            <summary>
+            Get driving Risk sheet
+            </summary>
+            <param name="filter">Left Menu selection</param>
+            <returns>200 - Successfully got driving Risk sheet</returns>
+            <returns>500 - Exception</returns>  
+        </member>
+        <member name="M:Piping.WebApi.Controllers.RiskAnalysisController.GetAnalysisRiskMatrix(Piping.DTO.RiskAnalysisFilterDTO)">
+            <summary>
+            Get Projected Analysis Risk Matrix
+            </summary>
+            <param name="filter">Left Menu selection</param>
+            <returns>200 - Successfully got Analyzed Projected Risk matrix</returns>
+            <returns>500 - Exception</returns>  
+        </member>
+        <member name="M:Piping.WebApi.Controllers.RiskAnalysisController.GetAnalysisRiskChart(Piping.DTO.RiskAnalysisFilterDTO)">
+            <summary>
+            Get Projected Analysis Risk chart
+            </summary>
+            <param name="filter">Left Menu selection</param>
+            <returns>200 - Successfully got Analyzed Projected Risk chart</returns>
+            <returns>500 - Exception</returns>  
+        </member>
+        <member name="M:Piping.WebApi.Controllers.RiskAnalysisController.GetAnalysisRiskSheet(Piping.DTO.RiskAnalysisFilterDTO)">
+            <summary>
+            Get Projected Analysis Risk Sheet
+            </summary>
+            <param name="filter">Left Menu selection</param>
+            <returns>200 - Successfully got Analyzed Projected Risk sheet</returns>
+            <returns>500 - Exception</returns>  
+        </member>
+        <member name="M:Piping.WebApi.Controllers.RiskAnalysisController.AnalyzeRisk(Piping.DTO.RiskAnalysisParameterDTO)">
+            <summary>
+            Analyze Risk
+            </summary>
+            <param name="filter">Left Menu selection</param>
+            <returns>200 - Successfully Analyzed Projected Risk</returns>
+            <returns>500 - Exception</returns>  
+        </member>
+        <member name="M:Piping.WebApi.Controllers.RiskAnalysisController.GetCummulativeRisk(Piping.DTO.RiskAnalysisFilterDTO)">
+            <summary>
+            GetCummulativeRisk
+            </summary>
+            <param name="filter">Left Menu selection</param>
+            <returns>200 - Successfully get Risk</returns>
+            <returns>500 - Exception</returns>  
+        </member>
+        <member name="M:Piping.WebApi.Controllers.RiskAnalysisController.GetPipingStatusChart(Piping.DTO.RiskAnalysisFilterDTO)">
+            <summary>
+            Get Piping Status Chart
+            </summary>
+            <param name="filter">Left Menu selection</param>
+            <returns>200 - Successfully got Piping Status Chart</returns>
+            <returns>500 - Exception</returns>  
+        </member>
+        <member name="M:Piping.WebApi.Controllers.StructuralMinThkController.GetDropdownList">
+            <summary>
+            Gets the dropdown values.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Piping.WebApi.Controllers.UserController">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="M:Piping.WebApi.Controllers.UserController.#ctor(Piping.Interfaces.Managers.IUserManager,AutoMapper.IMapper,Microsoft.Extensions.Logging.ILogger{Piping.WebApi.Controllers.UserController},Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            User Constructor
+            </summary>
+        </member>
+        <member name="M:Piping.WebApi.Controllers.UserController.Register(Piping.DTO.UserRegisterDTO)">
+            <summary>
+            Register new user
+            </summary>
+            <param name="userRegisterDTO">User Account and User Profile</param>
+            <returns>200 - Successfully registered User</returns>
+            <returns>400 - Bad Request</returns>
+            <returns>500 - Exception</returns> 
+        </member>
+        <member name="M:Piping.WebApi.Controllers.UserController.Login(Piping.DTO.UserLoginDTO)">
+            <summary>
+            Login
+            </summary>
+            <param name="userLoginDTO">Username, Password</param>
+            <returns>200 - Successfully LoggedIn</returns>
+            <returns>401 - Unauthorized</returns>
+            <returns>500 - Exception</returns> 
+        </member>
+        <member name="M:Piping.WebApi.Controllers.UserController.Logout(Piping.DTO.UserLoginDTO)">
+            <summary>
+            Logout
+            </summary>
+            <param name="userLoginDTO">Username</param>
+            <returns>200 - Successfully Loggedout</returns>       
+            <returns>500 - Exception</returns>
+        </member>
+    </members>
+</doc>
