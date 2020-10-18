@@ -1,0 +1,3760 @@
+CREATE OR REPLACE FUNCTION udf_NORMSDIST(x NUMERIC) RETURNS NUMERIC AS $$
+           
+    DECLARE 
+    result NUMERIC;
+    L NUMERIC;
+    N NUMERIC;
+    dCND NUMERIC;
+    pi NUMERIC;
+    a1 NUMERIC;
+    a2 NUMERIC;
+    a3 NUMERIC;
+    a4 NUMERIC;
+    a5 NUMERIC;
+     BEGIN
+    --SELECT L = 0.0
+    N := 0.0;
+    dCND := 0.0;
+
+    a1 := 0.31938153;
+    a2 := -0.356563782;
+    a3 :=  1.781477937;
+    a4 := -1.821255978;
+    a5 := 1.330274429;
+    pi := 3.1415926535897932384626433832795;
+
+    L := Abs(x);
+
+    IF L >= 30 THEN
+    IF sign(x) = 1 THEN
+    result := 1; 
+    ELSE
+    result := 0; 
+    END IF;
+    ELSE
+    -- perform calculation
+    N :=   1.0 / (1.0 + 0.2316419 * L);
+    dCND := 1.0 - 1.0 / Sqrt(2 * pi) * Exp(-L * L / 2.0) *
+    (a1 * N + a2 * N * N + a3 * POWER(N, 3.0) + a4 * POWER(N, 4.0) + a5 * POWER (N, 5.0)) ;
+    IF (x < 0) THEN
+    result := 1.0 - dCND;
+    ELSE
+    result := dCND;
+    END IF;
+    END IF;
+
+    RETURN result;
+    END;
+    $$ LANGUAGE plpgsql;
+
+
+    CREATE OR REPLACE FUNCTION udf_AllowableStress(I_MATERIAL_STD VARCHAR, I_MATERIAL_GRADE VARCHAR, I_DESIGN_TEMP_DEGF NUMERIC(10,3)) RETURNS NUMERIC(10,3) AS $$
+           
+    DECLARE 
+    V_ALLOWABLE_STRESS_PSI NUMERIC(10,3) := 1;
+     BEGIN
+    		IF(I_DESIGN_TEMP_DEGF <= 40.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_40",'')::Numeric),1) INTO V_ALLOWABLE_STRESS_PSI FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 40.0 AND I_DESIGN_TEMP_DEGF <= 65.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_41_UPTO_65",'')::Numeric),1) INTO V_ALLOWABLE_STRESS_PSI FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 65.0 AND I_DESIGN_TEMP_DEGF <= 100.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_66_UPTO_100",'')::Numeric),1) INTO V_ALLOWABLE_STRESS_PSI FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 100.0 AND I_DESIGN_TEMP_DEGF <= 125.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_101_UPTO_125",'')::Numeric),1) INTO V_ALLOWABLE_STRESS_PSI FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 125.0 AND I_DESIGN_TEMP_DEGF <= 150.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_126_UPTO_150",'')::Numeric),1) INTO V_ALLOWABLE_STRESS_PSI FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 150.0 AND I_DESIGN_TEMP_DEGF <= 175.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_151_UPTO_175",'')::Numeric),1) INTO V_ALLOWABLE_STRESS_PSI FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 175.0 AND I_DESIGN_TEMP_DEGF <= 200.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_176_UPTO_200",'')::Numeric),1) INTO V_ALLOWABLE_STRESS_PSI FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 200.0 AND I_DESIGN_TEMP_DEGF <= 225.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_201_UPTO_225",'')::Numeric),1) INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 225.0 AND I_DESIGN_TEMP_DEGF <= 250.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_226_UPTO_250",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 250.0 AND I_DESIGN_TEMP_DEGF <= 275.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_251_UPTO_275",'')::Numeric),1) INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 275.0 AND I_DESIGN_TEMP_DEGF <= 300.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_276_UPTO_300",'')::Numeric),1) INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 300.0 AND I_DESIGN_TEMP_DEGF <= 325.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_301_UPTO_325",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 325.0 AND I_DESIGN_TEMP_DEGF <= 350.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_326_UPTO_350",'')::Numeric),1) INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 350.0 AND I_DESIGN_TEMP_DEGF <= 375.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_351_UPTO_375",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 375.0 AND I_DESIGN_TEMP_DEGF <= 400.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_376_UPTO_400",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 400.0 AND I_DESIGN_TEMP_DEGF <= 425.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_401_UPTO_425",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 425.0 AND I_DESIGN_TEMP_DEGF <= 450.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_426_UPTO_450",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 450.0 AND I_DESIGN_TEMP_DEGF <= 475.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_451_UPTO_475",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 475.0 AND I_DESIGN_TEMP_DEGF <= 500.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_476_UPTO_500",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+
+    		ELSIF(I_DESIGN_TEMP_DEGF > 500.0 AND I_DESIGN_TEMP_DEGF <= 525.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_501_UPTO_525",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 525.0 AND I_DESIGN_TEMP_DEGF <= 550.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_526_UPTO_550",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 550.0 AND I_DESIGN_TEMP_DEGF <= 575.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_551_UPTO_575",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 575.0 AND I_DESIGN_TEMP_DEGF <= 600.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_576_UPTO_600",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 600.0 AND I_DESIGN_TEMP_DEGF <= 625.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_601_UPTO_625",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 625.0 AND I_DESIGN_TEMP_DEGF <= 650.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_626_UPTO_650",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 650.0 AND I_DESIGN_TEMP_DEGF <= 675.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_651_UPTO_675",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 675.0 AND I_DESIGN_TEMP_DEGF <= 700.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_676_UPTO_700",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 700.0 AND I_DESIGN_TEMP_DEGF <= 725.0) THEN
+    	
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_701_UPTO_725",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 725.0 AND I_DESIGN_TEMP_DEGF <= 750.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_726_UPTO_750",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 750.0 AND I_DESIGN_TEMP_DEGF <= 775.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_751_UPTO_775",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 775.0 AND I_DESIGN_TEMP_DEGF <= 800.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_776_UPTO_800",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 800.0 AND I_DESIGN_TEMP_DEGF <= 825.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_801_UPTO_825",'')::Numeric),1) INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 825.0 AND I_DESIGN_TEMP_DEGF <= 850.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_826_UPTO_850",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 850.0 AND I_DESIGN_TEMP_DEGF <= 875.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_851_UPTO_875",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 875.0 AND I_DESIGN_TEMP_DEGF <= 900.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_876_UPTO_900",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 900.0 AND I_DESIGN_TEMP_DEGF <= 925.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_901_UPTO_925",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 925.0 AND I_DESIGN_TEMP_DEGF <= 950.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_926_UPTO_950",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 950.0 AND I_DESIGN_TEMP_DEGF <= 975.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_951_UPTO_975",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 975.0 AND I_DESIGN_TEMP_DEGF <= 1000.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_976_UPTO_1000",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 1000.0 AND I_DESIGN_TEMP_DEGF <= 1025.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_1001_UPTO_1025",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 1025.0 AND I_DESIGN_TEMP_DEGF <= 1050.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_1026_UPTO_1050",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 1050.0 AND I_DESIGN_TEMP_DEGF <= 1075.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_1051_UPTO_1075",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		ELSIF(I_DESIGN_TEMP_DEGF > 1075.0 AND I_DESIGN_TEMP_DEGF <= 1100.0) THEN
+    		
+    			SELECT COALESCE((NULLIF("DTEMP_UPTO_1076_UPTO_1100",'')::Numeric),1)  INTO V_ALLOWABLE_STRESS_PSI  FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM(I_MATERIAL_STD)) AND "TYPE_GRADE" = UPPER(TRIM(I_MATERIAL_GRADE));
+    		
+    		END IF;
+    		
+    	RETURN COALESCE(V_ALLOWABLE_STRESS_PSI,1);
+    END;
+    $$ LANGUAGE plpgsql;
+
+    SELECT setval('"MST_StructuralMinThk_MST_StructuralMinThk_ID_seq"', (SELECT MAX("MST_StructuralMinThk_ID") FROM "MST_StructuralMinThk")+1);
+
+
+    -- PipeMaster Upload
+
+    -- PROCEDURE: public.usp_bulk_insert_pipe_master(json)
+
+    -- DROP PROCEDURE public.usp_bulk_insert_pipe_master(json);
+
+    CREATE OR REPLACE PROCEDURE public.usp_bulk_insert_pipe_master(
+    	json_pipemaster json)
+    LANGUAGE 'plpgsql'
+
+    AS $BODY$ 
+
+    DECLARE 
+    BEGIN
+    /*
+    TRUNCATE ONLY "PipeMaster"  RESTART IDENTITY CASCADE ;
+    TRUNCATE ONLY "RiskAnalysis"  RESTART IDENTITY CASCADE ;
+    TRUNCATE ONLY "POF_IC" RESTART IDENTITY ;
+    TRUNCATE ONLY "POF_EC" RESTART IDENTITY ; 
+    */
+     INSERT INTO "PipeMaster" (
+     "PipeMasterID"
+    ,"EquipmentNo"
+    ,"FromTo"
+    ,"Train"
+    ,"Description"
+    ,"PandIDNo"
+    ,"PlantCode"
+    ,"AreaCode"
+    ,"Fluid"
+    ,"FluidCode"
+    ,"FluidName"
+    ,"SubFluid"
+    ,"YearInService"
+    ,"DesignTemperature"
+    ,"DesignPressure"
+    ,"OperatingTemperature"
+    ,"OperatingPressure"
+    ,"PWHT"
+    ,"MaterialCode"
+    ,"MaterialStd"
+    ,"MaterialGrade"
+    ,"PipeSpec"
+    ,"NominalDiameter"
+    ,"NominalThick"
+    ,"Length"
+    ,"JointEfficiency"
+    ,"Insulated"
+    ,"InsulationType"
+    ,"CorrosionAllowance"
+    ,"MDMT"
+    ,"ConstructionCode"
+    ,"CorrosionLoopNo"
+    ,"PipeClusterNo"
+    ,"UseLastMeasuredThick_ULMT"
+    ,"LastMeasuredThick_LMT"
+    ,"LastMeasuredYear_LMY"
+    ,"MinReqThkOption_MRTO"
+    ,"UserCalPrMinReqThk_UMT"
+    ,"AnalysisYear"
+    ,"CreatedDate"
+    ,"CreatedBy")
+     SELECT 
+    (rec->>'ID')::NUMERIC
+    ,(rec->>'Line no')::VARCHAR(25)
+    ,(rec->>'From to')::VARCHAR(100)
+    ,(rec->>'Train')::VARCHAR(25)
+    ,(rec->>'Description')::VARCHAR(100)
+    ,(rec->>'P&ID No')::VARCHAR(25)
+    ,(rec->>'Plant')::VARCHAR(50)
+    ,(rec->>'Area')::VARCHAR(8)
+    ,(rec->>'Fluid')::VARCHAR(10)
+    ,(rec->>'Fluid')::VARCHAR(10)
+    ,(rec->>'Fluid')::VARCHAR(100)
+    ,'1'
+    ,NULLIF((rec->>'YIS'), '')::INT
+    ,NULLIF((rec->>'Design Temp ©'), '')::NUMERIC(10,3)
+    ,NULLIF((rec->>'Design Pressure (KPA)'), '')::NUMERIC(10,3)
+    ,NULLIF((rec->>'Operating Temp ©'), '')::NUMERIC(10,3)
+    ,NULLIF((rec->>'Operating Pressure(KPA)'), '')::NUMERIC(10,3)
+    ,(rec->>'PWHT')::VARCHAR(1)
+    ,(rec->>'Material Code')::VARCHAR(10)
+    ,REPLACE(((rec->>'Material Standard')::VARCHAR(10)), 'SA', 'SA–') 
+    ,(rec->>'Material Grade')::VARCHAR(10)
+    ,(rec->>'Pipe Spec')::VARCHAR(10)
+    ,NULLIF((rec->>'Nom Dia'), '')::NUMERIC(10,3)
+    ,NULLIF((rec->>'Nom Thk'), '')::NUMERIC(10,3)
+    ,NULLIF((rec->>'Length'), '')::NUMERIC(10,3)
+    ,NULLIF((rec->>'Joint Eff'), '')::NUMERIC(10,3)
+    ,(rec->>'Insulated')::VARCHAR(1)
+    ,(rec->>'Insulation Type')::VARCHAR(20)
+    ,NULLIF((rec->>'Corrosion Allowance'), '')::NUMERIC(10,3)
+    ,NULLIF((rec->>'MDMT'), '')::NUMERIC(10,3)
+    ,(rec->>'Construction Code')::VARCHAR(20)
+    ,(rec->>'Loop No')::VARCHAR(25)
+    ,(rec->>'Cluster No')::VARCHAR(50)
+    ,(rec->>'Select LMT')::VARCHAR(1)
+    ,NULLIF((rec->>'Last MEsauredThk'), '')::NUMERIC(10,3)
+    ,NULLIF((rec->>'LastMeasured Year'), '')::NUMERIC(4,0)
+    ,(rec->>'MinReqThkOption')::VARCHAR(10)
+    ,NULLIF((rec->>'User cal Min Thk'), '')::NUMERIC(10,3)
+    ,EXTRACT(YEAR FROM NOW())
+    ,NOW()
+    ,'SYSADMIN'
+     FROM
+     json_array_elements(json_pipemaster) rec 
+     WHERE  
+     NOT EXISTS (SELECT 1 FROM "PipeMaster" WHERE "EquipmentNo" = ((rec->>'Line no')::VARCHAR(25)));
+
+    UPDATE "PipeMaster" SET "MaterialStd" = REPLACE("MaterialStd",'SA','SA–') WHERE "MaterialStd" NOT LIKE 'SA–%';
+    UPDATE "PipeMaster" SET "MaterialGrade" = REPLACE("MaterialGrade",'GR','');
+    UPDATE "PipeMaster" SET "AnalysisYear" = EXTRACT(YEAR FROM NOW());
+    --UPDATE "PipeMaster" SET "MinReqThkOption_MRTO" = 'NomThk-CA';
+
+    UPDATE "PipeMaster"  SET 
+    "AllowableStressMPA_S" = (udf_AllowableStress(UPPER(TRIM("MaterialStd")),UPPER(TRIM("MaterialGrade")), ("DesignTemperature"::NUMERIC(10,3)) ) * 1000 )
+    ,"YieldStrengthMPA_YS" = (SELECT COALESCE((NULLIF(MAX("YIELD_STRENGTH_MPA"),'')::Numeric),1) FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM("MaterialStd")) AND "TYPE_GRADE" = UPPER(TRIM("MaterialGrade"))) 
+    ,"TensileStrengthMPA_TS" = (SELECT COALESCE((NULLIF(MAX("TENSILE_STRENGTH_MPA"),'')::Numeric),1) FROM "MST_MATERIAL" WHERE "SPEC_NO" = UPPER(TRIM("MaterialStd")) AND "TYPE_GRADE" = UPPER(TRIM("MaterialGrade")))
+    ,"StructuralMinThk_SMT" = (SELECT Min("StructureWallThickness_MM") FROM "MST_StructuralMinThk" WHERE "OutsideDiameter_MM" >= "NominalDiameter")
+    ,"EffectiveMinReqThk_EMRT" = (CASE WHEN "MinReqThkOption_MRTO" = 'NomThk-CA' THEN (CASE WHEN "CorrosionAllowance" <= 0 THEN ("NominalThick" * 0.9)  ELSE ("NominalThick" - "CorrosionAllowance") END) 
+    ELSE (CASE WHEN "UserCalPrMinReqThk_UMT" > 0 THEN "UserCalPrMinReqThk_UMT" 
+    ELSE --( P * D ) / (2 * (( S * E ) - (0.6 * P))) 
+    ("DesignPressure" * "NominalDiameter" ) / (2 * (((udf_AllowableStress(UPPER(TRIM("MaterialStd")),UPPER(TRIM("MaterialGrade")), "DesignTemperature" )) * "JointEfficiency") - (0.6 * "DesignPressure")))
+    END) END) 
+    -- ,(CASE WHEN "UseLastMeasuredThick_ULMT" = 'Y' THEN (EXTRACT(YEAR FROM NOW()) - "LastMeasuredYear_LMY" ) ELSE (EXTRACT(YEAR FROM NOW()) - "YearInService") END) "EffectiveAge_EAGE"
+    , "EffectiveThk_ETHK" = (CASE WHEN "UseLastMeasuredThick_ULMT" = 'Y' THEN "LastMeasuredThick_LMT"  ELSE "NominalThick" END);
+
+    --FlowStress (( YS + TS ) / 2 ) * 1.1 * E
+    UPDATE "PipeMaster" SET "FlowStress_FS" = ROUND(((( "YieldStrengthMPA_YS" + "TensileStrengthMPA_TS" ) / 2 ) * 1.1 * "JointEfficiency") ,5);
+    -- StengthRatio ( S * E * EMRT ) / ( FS * ETHK )5)
+    UPDATE "PipeMaster" SET "StengthRatio_SR" =ROUND(((( "AllowableStressMPA_S"/1000) * "JointEfficiency" * "EffectiveMinReqThk_EMRT" ) / (((( "YieldStrengthMPA_YS" + "TensileStrengthMPA_TS" ) / 2 ) * 1.1 * "JointEfficiency") * "EffectiveThk_ETHK" )),5);
+
+    --CREATE TABLE "POF_IC" AS SELECT * FROM "POF_IC" WHERE 1=2;
+
+    INSERT INTO "POF_IC" (
+     "POF_IC_ID"
+    ,"PipeMasterID"
+    ,"EquipmentNo"
+    ,"InjectionPoints"
+    ,"TheoriticalCR"
+    ,"MeasuredLCR"
+    ,"MeasuredSCR"
+    ,"UseMeasuredLCR"
+    ,"UseMeasuredSCR"
+    ,"VeryHigh"
+    ,"High"
+    ,"Medium"
+    ,"Low"
+    ,"Found"
+    ,"LastMeasuredYear"
+    ,"AnalysisYear"
+    ,"EffectiveCR"
+    ,"EffectiveAge"
+    ,"FlowStress"
+    ,"StrengthRatio"
+    ,"Art"
+    ,"DamageFactor"
+    ,"POF"
+    ,"CreatedDate"
+    ,"CreatedBy")
+     SELECT 
+    (rec->>'ID')::NUMERIC
+    ,(rec->>'ID')::NUMERIC
+    ,(rec->>'Line no')::VARCHAR(25)
+    ,(rec->>'InjectionPoints')::VARCHAR(1)
+    ,NULLIF((rec->>'TheoriticalICR'),'')::NUMERIC(10,3)
+    ,NULLIF((rec->>'LongtermICR'),'')::NUMERIC(10,3)
+    ,NULLIF((rec->>'ShortTermICR'),'')::NUMERIC(10,3)
+    ,(rec->>'UseLICR')::VARCHAR(1)
+    ,(rec->>'UseSICR')::VARCHAR(1)
+    ,(rec->>'VeryHigh_IC')::INT
+    ,(rec->>'HIGH_IC')::INT
+    ,(rec->>'MEDIUM_IC')::INT
+    ,(rec->>'LOW_IC')::INT
+    ,0
+    ,EXTRACT(YEAR FROM NOW())
+    ,EXTRACT(YEAR FROM NOW())
+    ,(rec->>'TheoriticalICR')::NUMERIC(10,3)
+    ,(CASE WHEN ((rec->>'Select LMT')::VARCHAR(1)) = 'Y' THEN (EXTRACT(YEAR FROM NOW()) - (NULLIF((rec->>'LastMeasured Year'), '')::NUMERIC(4,0)) ) ELSE (EXTRACT(YEAR FROM NOW()) - (NULLIF((rec->>'YIS'), '')::INT)) END) 
+    --,(SELECT MAX("FlowStress_FS") FROM "PipeMaster" WHERE "EquipmentNo" = ((rec->>'Line no')::VARCHAR(25)))
+    --,(SELECT MAX("StengthRatio_SR") FROM "PipeMaster" WHERE "EquipmentNo" = ((rec->>'Line no')::VARCHAR(25)))
+    --,1
+    ,0
+    ,0
+    ,0
+    ,0
+    ,0
+    ,NOW()
+    ,'SYSADMIN'
+     FROM
+     json_array_elements(json_pipemaster) rec;
+
+
+    UPDATE "POF_IC" SET "EffectiveCR" = (CASE WHEN "UseMeasuredLCR" = 'Y' THEN "MeasuredLCR" ELSE (CASE WHEN "UseMeasuredSCR" = 'Y' THEN "MeasuredSCR" ELSE (CASE WHEN "InjectionPoints" = 'Y' THEN (2 * "TheoriticalCR") ELSE "TheoriticalCR" END) END) END);
+    UPDATE "POF_IC" SET "Art" = ROUND((("EffectiveCR" * "EffectiveAge") / (SELECT MAX("EffectiveThk_ETHK") FROM "PipeMaster" WHERE "EquipmentNo" = "POF_IC"."EquipmentNo")),5);
+    UPDATE "POF_IC" SET "FlowStress" =  ROUND((SELECT MAX("FlowStress_FS") FROM "PipeMaster" WHERE "EquipmentNo" = "POF_IC"."EquipmentNo"),5);
+    UPDATE "POF_IC" SET "StrengthRatio" = ROUND((SELECT MAX("StengthRatio_SR") FROM "PipeMaster" WHERE "EquipmentNo" = "POF_IC"."EquipmentNo"),5);
+    UPDATE "POF_IC" SET "DamageFactor" = 
+    GREATEST(ROUND(((
+     (((0.5*(POWER(0.90,"VeryHigh")*POWER(0.7,"High")*POWER(0.5,"Medium")*POWER(0.40,"Low")))/((0.5*(POWER(0.90,"VeryHigh")*POWER(0.7,"High")*POWER(0.5,"Medium")*POWER(0.40,"Low"))) * (0.3*(POWER(0.09,"VeryHigh")*POWER(0.2,"High")*POWER(0.3,"Medium")*POWER(0.33,"Low"))) * (0.2*(POWER(0.01,"VeryHigh")*POWER(0.1,"High")*POWER(0.2,"Medium")*POWER(0.27,"Low"))))) * udf_NORMSDIST((-1 * ((1-(1*"Art")-"StrengthRatio")/SQRT((POWER(1,2) * POWER("Art",2)*POWER(0.2,2))+(POWER(1-(1*"Art"),2))*(POWER(0.2,2))+(POWER("StrengthRatio",2)*POWER(0.05,2)))))::NUMERIC))
+    +(((0.3*(POWER(0.09,"VeryHigh")*POWER(0.2,"High")*POWER(0.3,"Medium")*POWER(0.33,"Low")))/((0.5*(POWER(0.90,"VeryHigh")*POWER(0.7,"High")*POWER(0.5,"Medium")*POWER(0.40,"Low"))) * (0.3*(POWER(0.09,"VeryHigh")*POWER(0.2,"High")*POWER(0.3,"Medium")*POWER(0.33,"Low"))) * (0.2*(POWER(0.01,"VeryHigh")*POWER(0.1,"High")*POWER(0.2,"Medium")*POWER(0.27,"Low"))))) * udf_NORMSDIST((-1 * ((1-(2*"Art")-"StrengthRatio")/SQRT((POWER(2,2) * POWER("Art",2)*POWER(0.2,2))+(POWER(1-(2*"Art"),2))*(POWER(0.2,2))+(POWER("StrengthRatio",2)*POWER(0.05,2)))))::NUMERIC))
+    +(((0.2*(POWER(0.01,"VeryHigh")*POWER(0.1,"High")*POWER(0.2,"Medium")*POWER(0.27,"Low")))/((0.5*(POWER(0.90,"VeryHigh")*POWER(0.7,"High")*POWER(0.5,"Medium")*POWER(0.40,"Low"))) * (0.3*(POWER(0.09,"VeryHigh")*POWER(0.2,"High")*POWER(0.3,"Medium")*POWER(0.33,"Low"))) * (0.2*(POWER(0.01,"VeryHigh")*POWER(0.1,"High")*POWER(0.2,"Medium")*POWER(0.27,"Low"))))) * udf_NORMSDIST((-1 * ((1-(4*"Art")-"StrengthRatio")/SQRT((POWER(4,2) * POWER("Art",2)*POWER(0.2,2))+(POWER(1-(4*"Art"),2))*(POWER(0.2,2))+(POWER("StrengthRatio",2)*POWER(0.05,2)))))::NUMERIC))
+    )/(0.000156)),5),0.1);
+    UPDATE "POF_IC" SET "POF" = LEAST(ROUND(abs(log(((3.06*0.00001) * (CASE WHEN "DamageFactor" = 0 THEN 1 ELSE "DamageFactor" END )))),0),5)  ;
+
+    -- What IF Analysis
+    UPDATE "PipeMaster" SET "OverallCOF" = 'A' WHERE "PipeMasterID" <=300;
+    UPDATE "PipeMaster" SET "OverallCOF" = 'B' WHERE "PipeMasterID" > 300;
+    UPDATE "PipeMaster" SET "OverallCOF" = 'C' WHERE "PipeMasterID" > 600;
+    UPDATE "PipeMaster" SET "OverallCOF" = 'D' WHERE "PipeMasterID" > 900;
+    UPDATE "PipeMaster" SET "OverallCOF" = 'E' WHERE "PipeMasterID" > 1200;
+    UPDATE "POF_IC" SET "POF" = 5 WHERE "POF" > 5;
+    UPDATE "POF_IC" SET "POF" = 1 WHERE "POF" = 0;
+    UPDATE "PipeMaster" SET "OverallPOF" = (SELECT "POF" FROM "POF_IC" WHERE "POF_IC"."EquipmentNo" = "PipeMaster"."EquipmentNo");
+    UPDATE "PipeMaster" SET "OverallRisk" = (SELECT MAX("Risk") FROM "MST_RiskPriority" WHERE "MST_RiskPriority"."POF" = "PipeMaster"."OverallPOF"::NUMERIC AND "MST_RiskPriority"."COF" = "PipeMaster"."OverallCOF");
+
+    INSERT INTO "RiskAnalysis" (
+    	"RiskAnalysisID"
+        ,"CreatedBy" 
+        ,"CreatedDate" 
+        ,"EquipmentNo"
+        ,"COF"
+        ,"C_POF"
+        ,"C_Year" 
+    	,"C_Risk"
+    	,"C_Priority"
+    	,"C_Financial"
+    	,"C_FinancialRisk"
+    	,"A_POF"
+    	,"A_Year" 
+    	,"A_Risk"
+    	,"A_Priority"
+    	,"A_Financial"
+    	,"A_FinancialRisk"
+    )
+    SELECT 
+    "PipeMaster"."PipeMasterID"
+    ,'SYSADMIN'
+    ,NOW()
+    ,"PipeMaster"."EquipmentNo"
+    ,"PipeMaster"."OverallCOF"
+    ,"PipeMaster"."OverallPOF"::INT
+    ,"PipeMaster"."AnalysisYear"
+    ,"MST_RiskPriority"."Risk"
+    ,"MST_RiskPriority"."Priority"
+    ,"MST_RiskPriority"."Financial"
+    ,"MST_RiskPriority"."Financial"
+    ,"PipeMaster"."OverallPOF"::INT
+    ,"PipeMaster"."AnalysisYear"
+    ,"MST_RiskPriority"."Risk"
+    ,"MST_RiskPriority"."Priority"
+    ,"MST_RiskPriority"."Financial"
+    ,"MST_RiskPriority"."Financial"
+    FROM
+    "PipeMaster" 
+    INNER JOIN "MST_RiskPriority" ON "MST_RiskPriority"."COF" = "PipeMaster"."OverallCOF" AND "MST_RiskPriority"."POF" = "PipeMaster"."OverallPOF"::INT;
+
+    WITH cte AS (
+        SELECT "RiskAnalysisID",
+    SUM ("C_FinancialRisk") OVER (ORDER BY "C_FinancialRisk" DESC, "RiskAnalysisID") AS "C_CummRisk"
+    FROM "RiskAnalysis"
+    )
+    UPDATE "RiskAnalysis"
+    SET "C_CummulativeRisk" = cte."C_CummRisk", "A_CummulativeRisk" = cte."C_CummRisk"
+    FROM cte
+    WHERE "RiskAnalysis"."RiskAnalysisID" = cte."RiskAnalysisID";
+
+
+    --CREATE TABLE "POF_EC" AS SELECT * FROM "POF_EC" WHERE 1=2;
+
+    INSERT INTO "POF_EC" (
+     "POF_EC_ID"
+    ,"PipeMasterID"
+    ,"EquipmentNo"
+    ,"SoilInterfaceCondensation"
+    ,"PipeDirectBeamComplexDesign"
+    ,"RepaintedYear"
+    ,"Repainted"
+    ,"Driver"
+    ,"CoatingQuality"
+    ,"CoatingAge"
+    ,"CoatAdjustment"
+    ,"LineAge"
+    ,"CorrosionType"
+    ,"ExternalProcess"
+    ,"InsulationCondition"
+    ,"Suceptability"
+    ,"AdjustedSuceptability"
+    ,"SeverityIndex"
+    ,"TheoriticalCR"
+    ,"MeasuredLCR"
+    ,"MeasuredSCR"
+    ,"UseMeasuredLCR"
+    ,"UseMeasuredSCR"
+    ,"VeryHigh"
+    ,"High"
+    ,"Medium"
+    ,"Low"
+    ,"Found"
+    ,"LastMeasuredYear"
+    ,"AnalysisYear"
+    ,"EffectiveCR"
+    ,"EffectiveAge"
+    ,"FlowStress"
+    ,"StrengthRatio"
+    ,"Art"
+    ,"DamageFactor"
+    ,"POF"
+    ,"CreatedDate"
+    ,"CreatedBy")
+     SELECT 
+    (rec->>'ID')::NUMERIC
+    ,(rec->>'ID')::NUMERIC
+    ,(rec->>'Line no')::VARCHAR(25)
+    ,(rec->>'SoilInterface/Conden')::VARCHAR(1)
+    ,(rec->>'Pipeonbeam/Complex')::VARCHAR(1)
+    ,NULLIF((rec->>'RepaintedYear'),'')::INT
+    ,'Y'
+    ,SUBSTRING(((rec->>'Driver')::VARCHAR(10)),1,1) 
+    ,SUBSTRING(Replace(((rec->>'CoatingQuality')::VARCHAR(10)),'Good','High'),1,1) 
+    ,(CASE WHEN (NULLIF((rec->>'RepaintedYear'),'')::INT) > 0 THEN (EXTRACT(YEAR FROM NOW()) - (NULLIF((rec->>'RepaintedYear'),'')::INT)) ELSE  (EXTRACT(YEAR FROM NOW()) - (NULLIF((rec->>'YIS'), '')::INT))   END)
+    ,0
+    ,(CASE WHEN ((rec->>'Select LMT')::VARCHAR(1)) = 'Y' THEN (EXTRACT(YEAR FROM NOW()) - (NULLIF((rec->>'LastMeasured Year'), '')::NUMERIC(4,0)) ) ELSE (EXTRACT(YEAR FROM NOW()) - (NULLIF((rec->>'YIS'), '')::INT)) END) 
+    ,'EC'
+    ,(rec->>'Externalprocess')::VARCHAR(25)
+    ,''
+    ,SUBSTRING(((rec->>'Suceptability')::VARCHAR(10)),1,1)
+    ,SUBSTRING(((rec->>'AdjSuceptability')::VARCHAR(10)),1,1)
+    ,0
+    ,NULLIF((rec->>'TheoriticalECR'),'')::NUMERIC(10,3)
+    ,NULLIF((rec->>'LongtermECR'),'')::NUMERIC(10,3)
+    ,NULLIF((rec->>'ShortTermECR'),'')::NUMERIC(10,3)
+    ,(rec->>'UseLECR')::VARCHAR(1)
+    ,(rec->>'UseSECR')::VARCHAR(1)
+    ,(rec->>'VeryHigh_EC')::INT
+    ,(rec->>'HIGH_EC')::INT
+    ,(rec->>'MEDIUM_EC')::INT
+    ,(rec->>'LOW_EC')::INT
+    ,(rec->>'Found')::INT
+    ,EXTRACT(YEAR FROM NOW())
+    ,EXTRACT(YEAR FROM NOW())
+    ,0
+    ,1
+    ,0
+    ,0
+    ,0
+    ,0
+    ,0
+    ,NOW()
+    ,'SYSADMIN'
+     FROM
+     json_array_elements(json_pipemaster) rec;
+
+    --UPDATE "POF_EC" SET "CoatingAge" = (CASE WHEN "RepaintedYear" > 0 THEN (EXTRACT(YEAR FROM NOW()) - (NULLIF((rec->>'RepaintedYear'),'')::INT)) ELSE  (EXTRACT(YEAR FROM NOW()) - (NULLIF((rec->>'YIS'), '')::INT))   END);
+
+    UPDATE "POF_EC" SET "TheoriticalCR" = COALESCE((SELECT "MST_ExternalCorrosionRate"."CorrosionRate" FROM "MST_ExternalCorrosionRate" WHERE "MST_ExternalCorrosionRate"."Driver" = "POF_EC"."Driver" AND "OperatingTemperatureInDegC" >= (SELECT "OperatingTemperature" FROM "PipeMaster" WHERE "PipeMaster"."EquipmentNo" = "POF_EC"."EquipmentNo" LIMIT 1) LIMIT 1),0);
+    UPDATE "POF_EC" SET "CoatAdjustment" = (CASE WHEN ("LineAge" >= "CoatingAge" AND "CoatingQuality" = 'L') THEN 0 ELSE (CASE WHEN ("LineAge" >= "CoatingAge" AND "CoatingQuality" = 'M') THEN LEAST(5, "CoatingAge")  ELSE (CASE WHEN ("LineAge" >= "CoatingAge" AND "CoatingQuality" = 'H') THEN LEAST(15, "CoatingAge") ELSE (
+    CASE WHEN ("LineAge" < "CoatingAge" AND "CoatingQuality" = 'L') THEN 0 ELSE (CASE WHEN ("LineAge" < "CoatingAge" AND "CoatingQuality" = 'M') THEN LEAST(5, ("CoatingAge" - "LineAge")) ELSE (CASE WHEN ("LineAge" < "CoatingAge" AND "CoatingQuality" = 'M') THEN LEAST(15, ("CoatingAge" - "LineAge")) ELSE 0 END) END) END) END) END) END);
+    UPDATE "POF_EC" SET "EffectiveAge" = ("LineAge" - "CoatAdjustment") ;
+    UPDATE "POF_EC" SET "EffectiveCR" = (CASE WHEN "UseMeasuredLCR" = 'Y' THEN "MeasuredLCR" ELSE (CASE WHEN "UseMeasuredSCR" = 'Y' THEN "MeasuredSCR" ELSE (CASE WHEN ("SoilInterfaceCondensation" = 'Y' OR  "PipeDirectBeamComplexDesign" = 'Y') THEN (2 * "TheoriticalCR") ELSE "TheoriticalCR" END) END) END);
+    UPDATE "POF_EC" SET "Art" = ROUND((("EffectiveCR" * "EffectiveAge") / (SELECT MAX("EffectiveThk_ETHK") FROM "PipeMaster" WHERE "EquipmentNo" = "POF_EC"."EquipmentNo")),5);
+    UPDATE "POF_EC" SET "FlowStress" =  ROUND((SELECT MAX("FlowStress_FS") FROM "PipeMaster" WHERE "EquipmentNo" = "POF_EC"."EquipmentNo"),5);
+    UPDATE "POF_EC" SET "StrengthRatio" = ROUND((SELECT MAX("StengthRatio_SR") FROM "PipeMaster" WHERE "EquipmentNo" = "POF_EC"."EquipmentNo"),5);
+    UPDATE "POF_EC" SET "DamageFactor" = 
+    GREATEST(ROUND(((
+     (((0.5*(POWER(0.90,"VeryHigh")*POWER(0.7,"High")*POWER(0.5,"Medium")*POWER(0.40,"Low")))/((0.5*(POWER(0.90,"VeryHigh")*POWER(0.7,"High")*POWER(0.5,"Medium")*POWER(0.40,"Low"))) * (0.3*(POWER(0.09,"VeryHigh")*POWER(0.2,"High")*POWER(0.3,"Medium")*POWER(0.33,"Low"))) * (0.2*(POWER(0.01,"VeryHigh")*POWER(0.1,"High")*POWER(0.2,"Medium")*POWER(0.27,"Low"))))) * udf_NORMSDIST((-1 * ((1-(1*"Art")-"StrengthRatio")/SQRT((POWER(1,2) * POWER("Art",2)*POWER(0.2,2))+(POWER(1-(1*"Art"),2))*(POWER(0.2,2))+(POWER("StrengthRatio",2)*POWER(0.05,2)))))::NUMERIC))
+    +(((0.3*(POWER(0.09,"VeryHigh")*POWER(0.2,"High")*POWER(0.3,"Medium")*POWER(0.33,"Low")))/((0.5*(POWER(0.90,"VeryHigh")*POWER(0.7,"High")*POWER(0.5,"Medium")*POWER(0.40,"Low"))) * (0.3*(POWER(0.09,"VeryHigh")*POWER(0.2,"High")*POWER(0.3,"Medium")*POWER(0.33,"Low"))) * (0.2*(POWER(0.01,"VeryHigh")*POWER(0.1,"High")*POWER(0.2,"Medium")*POWER(0.27,"Low"))))) * udf_NORMSDIST((-1 * ((1-(2*"Art")-"StrengthRatio")/SQRT((POWER(2,2) * POWER("Art",2)*POWER(0.2,2))+(POWER(1-(2*"Art"),2))*(POWER(0.2,2))+(POWER("StrengthRatio",2)*POWER(0.05,2)))))::NUMERIC))
+    +(((0.2*(POWER(0.01,"VeryHigh")*POWER(0.1,"High")*POWER(0.2,"Medium")*POWER(0.27,"Low")))/((0.5*(POWER(0.90,"VeryHigh")*POWER(0.7,"High")*POWER(0.5,"Medium")*POWER(0.40,"Low"))) * (0.3*(POWER(0.09,"VeryHigh")*POWER(0.2,"High")*POWER(0.3,"Medium")*POWER(0.33,"Low"))) * (0.2*(POWER(0.01,"VeryHigh")*POWER(0.1,"High")*POWER(0.2,"Medium")*POWER(0.27,"Low"))))) * udf_NORMSDIST((-1 * ((1-(4*"Art")-"StrengthRatio")/SQRT((POWER(4,2) * POWER("Art",2)*POWER(0.2,2))+(POWER(1-(4*"Art"),2))*(POWER(0.2,2))+(POWER("StrengthRatio",2)*POWER(0.05,2)))))::NUMERIC))
+    )/(0.000156)),5),0.1);
+    UPDATE "POF_EC" SET "POF" = LEAST(ROUND(abs(log(((3.06*0.00001) * (CASE WHEN "DamageFactor" = 0 THEN 1 ELSE "DamageFactor" END )))),0),5);
+
+    UPDATE "PipeMaster" SET "CorrosionLoopNo" = CONCAT("PlantCode" , '-' , "FluidCode" , '-1');
+
+    INSERT INTO "InspectionStrategy"("CreatedBy", "CreatedDate", "PipeMasterID", "EquipmentNo", "DMCode", "Priority", "Frequency", "RecommendedAction", "NDTMethod", "InspectionYear")
+        SELECT  'SYSADMIN', Now(), "PipeMasterID", "EquipmentNo", 'IC', 18, 10, 'Min. 50% Coverage & All Locations from Corrosion Study.', 'VI-Int', 2013
+    FROM "PipeMaster";
+    INSERT INTO "InspectionStrategy"("CreatedBy", "CreatedDate", "PipeMasterID", "EquipmentNo", "DMCode", "Priority", "Frequency", "RecommendedAction", "NDTMethod", "InspectionYear")
+        SELECT  'SYSADMIN', Now(), "PipeMasterID", "EquipmentNo",  'EC', 14, 10, '100% visual, 20% RT for CUI', 'VI-Int', 2013
+    FROM "PipeMaster";   
+    INSERT INTO "InspectionStrategy"("CreatedBy", "CreatedDate", "PipeMasterID", "EquipmentNo", "DMCode", "Priority", "Frequency", "RecommendedAction", "NDTMethod", "InspectionYear")
+         SELECT 'SYSADMIN', Now(), "PipeMasterID", "EquipmentNo",  'SCC', 8, 5, 'PT Test on 10% welds', 'CUI Inspection-Visual', 2013
+    FROM "PipeMaster";
+
+    INSERT INTO "PipeMasterCOF"(
+    	"PipeMasterCOFID", "CreatedBy", "CreatedDate", "PipeMasterID", "EquipmentNo", "FluidCode",  "Fluid","ApplicableFluid", "ToxicFluid", "ToxicFluidPercentage", "ReleaseState", "StoredStage", "ReleaseModel", "OperatingPressure", "DetectionRating", "IsolationRating", "Mitigation", "ComponentDiameter", "ComponentLength", "OperatingTemperature", "IgnitionSource", "MassInventory", "MassComponent", "NormalBoilingPoint", "MolecularWeight", "FluidPhase", "FluidPhaseStored", "ComponentType", "Flammable", "Toxic", "NFNT", "ProductionLoss")
+    	SELECT  "PipeMasterID", 'SYSADMIN', Now(), "PipeMasterID", "EquipmentNo", "FluidCode","FluidCode", 'C1-C2', '',100,'Gas', 'Liquid', 'Gas' , "OperatingPressure", 'C','C', 'NA', "NominalDiameter", "Length", "OperatingTemperature",'',20000,0,0,0,'Gas','Liquid', 'PIPE','Y','N','N',0
+    	FROM "PipeMaster";
+
+    END;
+    $BODY$;
+
+
+
+
+
+
+
+
+
+    -- What IF Analysis
+
+
+    CREATE OR REPLACE PROCEDURE public.usp_whatifanalysis(
+    	i_analysisyear integer,
+    	i_prioriry integer,
+    	i_very_high integer,
+    	i_high integer,
+    	i_medium integer,
+    	i_low integer)
+    LANGUAGE 'plpgsql'
+
+    AS $BODY$ 
+
+    DECLARE 
+    BEGIN
+
+    UPDATE "RiskAnalysis" SET "A_POF" = "C_POF",  "A_Year" = "C_Year", "A_Risk" = "C_Risk", "A_Priority" = "C_Priority", "A_Financial" = "C_Financial" 
+    , "A_FinancialRisk" = "C_FinancialRisk" , "A_CummulativeRisk" = "C_CummulativeRisk";
+
+    CREATE TABLE "TBL_POF_IC_COPY" AS SELECT "TBL_POF_IC_ID"
+    ,"EQUIPMENT_NO"
+    ,"PRESENT_YEAR"
+    ,"CORROSION_TYPE"
+    ,"YEAR_IN_SERVICE"								
+    ,"NOM_DIA_D_INCHES"								
+    ,"NOM_THK_NT_INCHES"							
+    ,"DESIGN_TEMP_DEGF"								
+    ,"DESIGN_PRESSURE_P_PSI"						
+    ,"EFFECTIVE_CORROSION_RATE"						
+    ,"MATERIAL_STD"									
+    ,"MATERIAL_GRADE"								
+    ,"INJECTION_POINTS_INTERMITENT"					
+    ,"CORROSION_ALLOWANCE"							
+    ,"VERY_HIGH"									
+    ,"HIGH"											
+    ,"MEDIUM"										
+    ,"LOW"											
+    ,"NO"											
+    ,"LAST_MEASURED_THK_FOR_DIA_LMT"				
+    ,"LAST_MEASURED_YEAR_FOR_DIA_LMY"				
+    ,"YIELD_STRENGTH_KSI"							
+    ,"TENSILE_STREGTH_KSI"									
+    ,"EFFICIENCY_OF_WELD_E"							
+    ,"YOUNGS_MODULUS_Y"								
+    ,"ALLOWABLE_STRESS_PSI"		        
+    ,"EFFECTIVE_THK"						        	
+    ,"EFFECTIVE_AGE"						        	
+    ,"MIN_REQ_THK"							        
+    ,"EFFECTIVE_CORR_RATE"					        
+    ,"ART"									        
+    ,"FLOW_STRESS"							        
+    ,"STENGTH_RATIO"		        
+    ,"DAMAGE_FACTOR"							        	
+    ,"POF"				        	
+    ,"OVERALL_POF"	
+    ,"USE_LICR" 
+    ,"USE_SICR" 
+    ,"THEORETICAL_CORROSION_RATE_TICR" 
+    ,"MEASURED_LONGTERM_CORROSION_RATE_LICR"
+    ,"MEASURED_SHORTTERM_CORROSION_RATE_SICR" 	
+    ,"CreatedDate"                     	        
+    ,"CreatedBy" FROM "TBL_POF_IC" WHERE 1=2;
+
+
+    INSERT INTO "TBL_POF_IC_COPY" (	
+    "TBL_POF_IC_ID"
+    ,"EQUIPMENT_NO"
+    ,"PRESENT_YEAR"
+    ,"CORROSION_TYPE"
+    ,"YEAR_IN_SERVICE"								
+    ,"NOM_DIA_D_INCHES"								
+    ,"NOM_THK_NT_INCHES"							
+    ,"DESIGN_TEMP_DEGF"								
+    ,"DESIGN_PRESSURE_P_PSI"						
+    ,"EFFECTIVE_CORROSION_RATE"						
+    ,"MATERIAL_STD"									
+    ,"MATERIAL_GRADE"								
+    ,"INJECTION_POINTS_INTERMITENT"					
+    ,"CORROSION_ALLOWANCE"							
+    ,"VERY_HIGH"									
+    ,"HIGH"											
+    ,"MEDIUM"										
+    ,"LOW"											
+    ,"NO"											
+    ,"LAST_MEASURED_THK_FOR_DIA_LMT"				
+    ,"LAST_MEASURED_YEAR_FOR_DIA_LMY"				
+    ,"YIELD_STRENGTH_KSI"							
+    ,"TENSILE_STREGTH_KSI"									
+    ,"EFFICIENCY_OF_WELD_E"							
+    ,"YOUNGS_MODULUS_Y"								
+    ,"ALLOWABLE_STRESS_PSI"		        
+    ,"EFFECTIVE_THK"						        	
+    ,"EFFECTIVE_AGE"						        	
+    ,"MIN_REQ_THK"							        
+    ,"EFFECTIVE_CORR_RATE"					        
+    ,"ART"									        
+    ,"FLOW_STRESS"							        
+    ,"STENGTH_RATIO"		        
+    ,"DAMAGE_FACTOR"							        	
+    ,"POF"				        	
+    ,"OVERALL_POF"	
+    ,"USE_LICR" 
+    ,"USE_SICR" 
+    ,"THEORETICAL_CORROSION_RATE_TICR" 
+    ,"MEASURED_LONGTERM_CORROSION_RATE_LICR"
+    ,"MEASURED_SHORTTERM_CORROSION_RATE_SICR" 	
+    ,"CreatedDate"                     	        
+    ,"CreatedBy" 	
+    )
+    SELECT
+     "PM"."PipeMasterID"
+    ,"PM"."EquipmentNo"
+    ,I_ANALYSISYEAR
+    ,'IC'
+    ,"PM"."YearInService"
+    ,"PM"."NominalDiameter"
+    ,"PM"."NominalThick"
+    ,"PM"."DesignTemperature"
+    ,"PM"."DesignPressure"
+    ,"IC"."EffectiveCR"
+    ,"PM"."MaterialStd"
+    ,"PM"."MaterialGrade"
+    ,"IC"."InjectionPoints"
+    ,"PM"."CorrosionAllowance"
+    ,"IC"."VeryHigh" + I_VERY_HIGH
+    ,"IC"."High" + I_HIGH
+    ,"IC"."Medium" + I_MEDIUM
+    ,"IC"."Low" + I_LOW
+    ,0
+    ,"PM"."LastMeasuredThick_LMT"
+    ,"PM"."LastMeasuredYear_LMY"
+    ,"PM"."YieldStrengthMPA_YS"
+    ,"PM"."TensileStrengthMPA_TS"
+    ,"PM"."JointEfficiency"
+    ,1
+    ,"PM"."AllowableStressMPA_S"
+    ,"PM"."EffectiveThk_ETHK"
+    --,"IC"."EffectiveAge"
+    ,(CASE WHEN "PM"."UseLastMeasuredThick_ULMT" = 'Y' THEN (I_ANALYSISYEAR - "PM"."LastMeasuredYear_LMY") ELSE (I_ANALYSISYEAR - "PM"."YearInService") END) 
+    ,"PM"."EffectiveMinReqThk_EMRT"
+    ,"IC"."EffectiveCR"
+    ,"IC"."Art"
+    ,"IC"."FlowStress"
+    ,"IC"."StrengthRatio"
+    ,"IC"."DamageFactor"
+    ,"IC"."POF"
+    ,"IC"."POF"
+    ,"IC"."MeasuredLCR"
+    ,"IC"."MeasuredSCR"
+    ,"IC"."TheoriticalCR"
+    ,"IC"."UseMeasuredLCR"
+    ,"IC"."UseMeasuredSCR"
+    ,NOW()
+    ,'SYSADMIN'
+    FROM "PipeMaster" "PM"
+    INNER JOIN "POF_IC" "IC" ON "PM"."PipeMasterID" = "IC"."PipeMasterID"
+    WHERE "PM"."EquipmentNo" IN (SELECT t."EquipmentNo" FROM "RiskAnalysis" t WHERE t."C_Priority" <=  I_PRIORIRY);
+
+    UPDATE "TBL_POF_IC_COPY" SET "ART" = (("EFFECTIVE_CORR_RATE"::NUMERIC * "EFFECTIVE_AGE"::NUMERIC ) / "EFFECTIVE_THK"::NUMERIC );
+    UPDATE "TBL_POF_IC_COPY" SET "DAMAGE_FACTOR" = 
+    GREATEST(ROUND(((
+     (((0.5*(POWER(0.90,"VERY_HIGH"::NUMERIC)*POWER(0.7,"HIGH"::NUMERIC)*POWER(0.5,"MEDIUM"::NUMERIC)*POWER(0.40,"LOW"::NUMERIC)))/((0.5*(POWER(0.90,"VERY_HIGH"::NUMERIC)*POWER(0.7,"HIGH"::NUMERIC)*POWER(0.5,"MEDIUM"::NUMERIC)*POWER(0.40,"LOW"::NUMERIC))) * (0.3*(POWER(0.09,"VERY_HIGH"::NUMERIC)*POWER(0.2,"HIGH"::NUMERIC)*POWER(0.3,"MEDIUM"::NUMERIC)*POWER(0.33,"LOW"::NUMERIC))) * (0.2*(POWER(0.01,"VERY_HIGH"::NUMERIC)*POWER(0.1,"HIGH"::NUMERIC)*POWER(0.2,"MEDIUM"::NUMERIC)*POWER(0.27,"LOW"::NUMERIC))))) * udf_NORMSDIST((-1 * ((1-(1*"ART"::NUMERIC)-"STENGTH_RATIO"::NUMERIC)/SQRT((POWER(1,2) * POWER("ART"::NUMERIC,2)*POWER(0.2,2))+(POWER(1-(1*"ART"::NUMERIC),2))*(POWER(0.2,2))+(POWER("STENGTH_RATIO"::NUMERIC,2)*POWER(0.05,2)))))::NUMERIC))
+    +(((0.3*(POWER(0.09,"VERY_HIGH"::NUMERIC)*POWER(0.2,"HIGH"::NUMERIC)*POWER(0.3,"MEDIUM"::NUMERIC)*POWER(0.33,"LOW"::NUMERIC)))/((0.5*(POWER(0.90,"VERY_HIGH"::NUMERIC)*POWER(0.7,"HIGH"::NUMERIC)*POWER(0.5,"MEDIUM"::NUMERIC)*POWER(0.40,"LOW"::NUMERIC))) * (0.3*(POWER(0.09,"VERY_HIGH"::NUMERIC)*POWER(0.2,"HIGH"::NUMERIC)*POWER(0.3,"MEDIUM"::NUMERIC)*POWER(0.33,"LOW"::NUMERIC))) * (0.2*(POWER(0.01,"VERY_HIGH"::NUMERIC)*POWER(0.1,"HIGH"::NUMERIC)*POWER(0.2,"MEDIUM"::NUMERIC)*POWER(0.27,"LOW"::NUMERIC))))) * udf_NORMSDIST((-1 * ((1-(2*"ART"::NUMERIC)-"STENGTH_RATIO"::NUMERIC)/SQRT((POWER(2,2) * POWER("ART"::NUMERIC,2)*POWER(0.2,2))+(POWER(1-(2*"ART"::NUMERIC),2))*(POWER(0.2,2))+(POWER("STENGTH_RATIO"::NUMERIC,2)*POWER(0.05,2)))))::NUMERIC))
+    +(((0.2*(POWER(0.01,"VERY_HIGH"::NUMERIC)*POWER(0.1,"HIGH"::NUMERIC)*POWER(0.2,"MEDIUM"::NUMERIC)*POWER(0.27,"LOW"::NUMERIC)))/((0.5*(POWER(0.90,"VERY_HIGH"::NUMERIC)*POWER(0.7,"HIGH"::NUMERIC)*POWER(0.5,"MEDIUM"::NUMERIC)*POWER(0.40,"LOW"::NUMERIC))) * (0.3*(POWER(0.09,"VERY_HIGH"::NUMERIC)*POWER(0.2,"HIGH"::NUMERIC)*POWER(0.3,"MEDIUM"::NUMERIC)*POWER(0.33,"LOW"::NUMERIC))) * (0.2*(POWER(0.01,"VERY_HIGH"::NUMERIC)*POWER(0.1,"HIGH"::NUMERIC)*POWER(0.2,"MEDIUM"::NUMERIC)*POWER(0.27,"LOW"::NUMERIC))))) * udf_NORMSDIST((-1 * ((1-(4*"ART"::NUMERIC)-"STENGTH_RATIO"::NUMERIC)/SQRT((POWER(4,2) * POWER("ART"::NUMERIC,2)*POWER(0.2,2))+(POWER(1-(4*"ART"::NUMERIC),2))*(POWER(0.2,2))+(POWER("STENGTH_RATIO"::NUMERIC,2)*POWER(0.05,2)))))::NUMERIC))
+    )/(0.000156)),5),0.1);
+    UPDATE "TBL_POF_IC_COPY" SET "POF" = LEAST(round(abs(log(((3.06*0.00001) * (CASE WHEN ("DAMAGE_FACTOR"::NUMERIC) = 0 THEN 1 ELSE ("DAMAGE_FACTOR"::NUMERIC) END )))),0),5);
+
+    UPDATE "TBL_POF_IC_COPY" SET "POF" = '5' WHERE "POF"::INT > 5;
+    UPDATE "TBL_POF_IC_COPY" SET "POF" = '1' WHERE "POF"::INT = 0;
+    UPDATE "RiskAnalysis" SET "A_POF" = t."POF"::INT, "A_Year" =  t."PRESENT_YEAR"::INT
+    FROM "TBL_POF_IC_COPY" t 
+    WHERE "RiskAnalysis"."EquipmentNo" = t."EQUIPMENT_NO" ;
+    UPDATE "RiskAnalysis"
+    SET "A_Risk" = t."Risk", "A_Priority" = t."Priority", "A_Financial" = t."Financial" 
+    , "A_FinancialRisk" = t."Financial" 
+    FROM "MST_RiskPriority" t
+    WHERE "RiskAnalysis"."COF" = t."COF" AND "RiskAnalysis"."A_POF" = t."POF";
+
+    WITH cte AS (
+        SELECT "RiskAnalysisID",
+    SUM ("A_FinancialRisk") OVER (ORDER BY "A_FinancialRisk" DESC, "RiskAnalysisID") AS "A_CummRisk"
+    FROM "RiskAnalysis"
+    )
+    UPDATE "RiskAnalysis"
+    SET "A_CummulativeRisk" = cte."A_CummRisk"
+    FROM cte
+    WHERE "RiskAnalysis"."RiskAnalysisID" = cte."RiskAnalysisID";
+    DROP TABLE "TBL_POF_IC_COPY";
+    END;
+    $BODY$;
+
+
+
+    --------------------------------------------------------------------------------
+    -- POF IC calculation --
+    --------------------------------------------------------------------------------
+
+    CREATE OR REPLACE PROCEDURE SP_UPD_POF_IC(I_EQUIPMENT_NO VARCHAR(25)
+    ,I_PRESENT_YEAR NUMERIC
+    )
+    LANGUAGE plpgsql    
+    AS $BODY$ 
+
+    DECLARE 
+    V_CNT	INT;
+    V_YEAR_IN_SERVICE  NUMERIC;
+    V_NOM_DIA_D_INCHES NUMERIC;
+    V_NOM_THK_NT_INCHES NUMERIC;
+    V_DESIGN_TEMP_DEGF NUMERIC;
+    V_DESIGN_PRESSURE_P_PSI NUMERIC;
+    V_EFFECTIVE_CORROSION_RATE NUMERIC;
+    V_MATERIAL_STD VARCHAR(32);
+    V_MATERIAL_GRADE VARCHAR(32);
+    V_INJECTION_POINTS_INTERMITENT VARCHAR(1);
+    V_CORROSION_ALLOWANCE NUMERIC;
+    V_STRUCTURAL_MIN_THK NUMERIC;
+    V_OPTION_FOR_MIN_REQ_THK VARCHAR(100);
+    I_EFFICIENCY_OF_WELD_E  NUMERIC;
+    I_YOUNGS_MODULUS_Y     NUMERIC;
+    V_VERY_HIGH INT;
+    V_HIGH INT;
+    V_MEDIUM INT;
+    V_LOW INT;
+    V_NO INT;
+    V_USE_LICR VARCHAR(1);
+    V_USE_SICR VARCHAR(1);
+    V_THEORETICAL_CORROSION_RATE_TICR NUMERIC;
+    V_MEASURED_LONGTERM_CORROSION_RATE_LICR NUMERIC;
+    V_MEASURED_SHORTTERM_CORROSION_RATE_SICR NUMERIC;
+
+    V_LAST_MEASURED_THK_FOR_DIA_LMT NUMERIC;
+    V_LAST_MEASURED_YEAR_FOR_DIA_LMY NUMERIC;
+
+    V_YIELD_STRENGTH_KSI NUMERIC;
+    V_TENSILE_STREGTH_KSI NUMERIC;
+    V_EFFICIENCY_OF_WELD_E NUMERIC;
+    V_YOUNGS_MODULUS_Y NUMERIC;
+    V_ALLOWABLE_STRESS_PSI NUMERIC;
+
+    V_PRP_CONFIDENCE VARCHAR(15);
+    V_PRP_1 NUMERIC;
+    V_PRP_2 NUMERIC;
+    V_PRP_3 NUMERIC;
+
+    V_CONDITIONAL_PROBABILITY_1_A NUMERIC;
+    V_CONDITIONAL_PROBABILITY_1_B NUMERIC;
+    V_CONDITIONAL_PROBABILITY_1_C NUMERIC;
+    V_CONDITIONAL_PROBABILITY_1_D NUMERIC;
+    V_CONDITIONAL_PROBABILITY_1_E NUMERIC;
+    V_CONDITIONAL_PROBABILITY_2_A NUMERIC;
+    V_CONDITIONAL_PROBABILITY_2_B NUMERIC;
+    V_CONDITIONAL_PROBABILITY_2_C NUMERIC;
+    V_CONDITIONAL_PROBABILITY_2_D NUMERIC;
+    V_CONDITIONAL_PROBABILITY_2_E NUMERIC;
+    V_CONDITIONAL_PROBABILITY_3_A NUMERIC;
+    V_CONDITIONAL_PROBABILITY_3_B NUMERIC;
+    V_CONDITIONAL_PROBABILITY_3_C NUMERIC;
+    V_CONDITIONAL_PROBABILITY_3_D NUMERIC;
+    V_CONDITIONAL_PROBABILITY_3_E NUMERIC;
+
+    V_EFFECTIVE_AGE NUMERIC;
+    V_EFFECTIVE_THK NUMERIC;
+    V_MIN_REQ_THK NUMERIC;
+    V_EFFECTIVE_CORR_RATE NUMERIC;
+    V_ART NUMERIC;
+    V_FLOW_STRESS NUMERIC;
+    V_STENGTH_RATIO NUMERIC;
+    V_INSPECTION_EFFECTIVENESS_1 NUMERIC;
+    V_INSPECTION_EFFECTIVENESS_2 NUMERIC;
+    V_INSPECTION_EFFECTIVENESS_3 NUMERIC;
+    V_POSTERIOR_PROBABILITY_1 NUMERIC;
+    V_POSTERIOR_PROBABILITY_2 NUMERIC;
+    V_POSTERIOR_PROBABILITY_3 NUMERIC;
+    V_CAL_OF_BETA_COVT NUMERIC;
+    V_CAL_OF_BETA_COVSF NUMERIC;
+    V_CAL_OF_BETA_COVP NUMERIC;
+    V_CAL_OF_BETA_CONST_1 NUMERIC;
+    V_CAL_OF_BETA_CONST_2 NUMERIC;
+    V_CAL_OF_BETA_CONST_3 NUMERIC;
+    V_CAL_OF_BETA_1 NUMERIC;
+    V_CAL_OF_BETA_2 NUMERIC;
+    V_CAL_OF_BETA_3 NUMERIC;
+    V_CAL_OF_BETA_DS_VALUES_1 NUMERIC;
+    V_CAL_OF_BETA_DS_VALUES_2 NUMERIC;
+    V_CAL_OF_BETA_DS_VALUES_3 NUMERIC;
+    V_DAMAGE_FACTOR NUMERIC;
+    V_POF NUMERIC;
+    V_POF_EXPO NUMERIC;
+    V_AVAILABLE_THK NUMERIC;
+    V_REMAINING_LIFE NUMERIC;
+    V_HALF_LIFE NUMERIC;
+    V_POF_HALF_LIFE NUMERIC;
+    V_OVERALL_POF NUMERIC;
+    V_YIELD_STRENGTH_KSI1 VARCHAR(32);
+    BEGIN
+    V_CNT := 10;
+    RAISE INFO 'V_CNT %',V_CNT ;
+    ------ Start Get Pipe Master Details  -----
+
+    SELECT	
+    "YearInService"
+    ,"NominalDiameter"
+    ,"NominalThick"
+    ,"DesignTemperature"
+    ,"DesignPressure"
+    ,0
+    ,"MaterialStd"
+    ,"MaterialGrade"
+    ,'N'
+    ,"CorrosionAllowance"
+    ,"LastMeasuredThick_LMT"
+    ,"LastMeasuredYear_LMY"
+    ,'"LOW"'
+    ,"StructuralMinThk_SMT"
+    ,"MinReqThkOption_MRTO"
+    ,"JointEfficiency"
+    ,1
+    ,"AllowableStressMPA_S"
+    ,"YieldStrengthMPA_YS"
+    ,"TensileStrengthMPA_TS"
+    INTO
+    		 V_YEAR_IN_SERVICE
+    		,V_NOM_DIA_D_INCHES 
+    		,V_NOM_THK_NT_INCHES
+    		,V_DESIGN_TEMP_DEGF
+    		,V_DESIGN_PRESSURE_P_PSI
+    		,V_EFFECTIVE_CORROSION_RATE
+    		,V_MATERIAL_STD
+    		,V_MATERIAL_GRADE
+    		,V_INJECTION_POINTS_INTERMITENT
+    		,V_CORROSION_ALLOWANCE
+    		,V_LAST_MEASURED_THK_FOR_DIA_LMT
+    		,V_LAST_MEASURED_YEAR_FOR_DIA_LMY
+    		,V_PRP_CONFIDENCE
+    		,V_STRUCTURAL_MIN_THK
+    		,V_OPTION_FOR_MIN_REQ_THK
+    		,I_EFFICIENCY_OF_WELD_E
+    		,I_YOUNGS_MODULUS_Y
+    		,V_ALLOWABLE_STRESS_PSI
+    		,V_YIELD_STRENGTH_KSI
+    		,V_TENSILE_STREGTH_KSI		
+    FROM "PipeMaster" WHERE "EquipmentNo" = UPPER(TRIM(I_EQUIPMENT_NO));
+    ------ End Get Pipe Master Details  -----
+
+    ------ Start Get Inspection Confidence Details  -----
+
+     SELECT "VeryHigh"
+          ,"High"
+          ,"Medium"
+          ,"Low"
+          ,"Found"
+    	  ,"EffectiveCR"
+    	  ,"InjectionPoints"
+    	  ,"UseMeasuredLCR"
+    	  ,"UseMeasuredSCR"
+    	  ,"TheoriticalCR"
+    	  ,"MeasuredLCR"
+    	  ,"MeasuredSCR"
+    	  INTO
+    	  V_VERY_HIGH, V_HIGH, V_MEDIUM, V_LOW, V_NO
+    	  ,V_EFFECTIVE_CORROSION_RATE
+    	  ,V_INJECTION_POINTS_INTERMITENT
+    	  ,V_USE_LICR 
+    	  ,V_USE_SICR 
+          ,V_THEORETICAL_CORROSION_RATE_TICR 
+          ,V_MEASURED_LONGTERM_CORROSION_RATE_LICR 
+          ,V_MEASURED_SHORTTERM_CORROSION_RATE_SICR 
+    FROM "POF_IC"  WHERE "EquipmentNo" = UPPER(TRIM(I_EQUIPMENT_NO));  
+    ------ End Get Inspection Confidence Details  -----
+
+    ------ Start Get PRP Details  -----
+    --Begin try
+    SELECT "PRP_1"
+          ,"PRP_2"
+          ,"PRP_3"
+    INTO
+     V_PRP_1
+    ,V_PRP_2
+    ,V_PRP_3
+    FROM "TBL_PRP" WHERE "PRP_CONFIDENCE" = 'LOW';  --V_PRP_CONFIDENCE;
+    --end try
+    --begin catch
+    --			INSERT INTO ERROR_LOG (ErrorMessage,CodeLineNo,SqlName) VALUES(ERROR_MESSAGE(),ERROR_LINE(),ERROR_PROCEDURE());	
+    --end catch
+    ------ End Get PRP Details  -----
+
+    ------ Start Get Conditional Probability Details  -----
+    --Begin try
+    SELECT "A"
+          ,"B"
+          ,"C"
+          ,"D"
+          ,"E"
+    INTO
+    V_CONDITIONAL_PROBABILITY_1_A
+    ,V_CONDITIONAL_PROBABILITY_1_B
+    ,V_CONDITIONAL_PROBABILITY_1_C
+    ,V_CONDITIONAL_PROBABILITY_1_D
+    ,V_CONDITIONAL_PROBABILITY_1_E
+    FROM "TBL_COP" WHERE "COP_LEVEL" = 1;
+
+    SELECT "A"
+          ,"B"
+          ,"C"
+          ,"D"
+          ,"E"
+    INTO
+     V_CONDITIONAL_PROBABILITY_2_A
+    ,V_CONDITIONAL_PROBABILITY_2_B
+    ,V_CONDITIONAL_PROBABILITY_2_C
+    ,V_CONDITIONAL_PROBABILITY_2_D
+    ,V_CONDITIONAL_PROBABILITY_2_E
+    FROM "TBL_COP" WHERE "COP_LEVEL" = 2;
+
+    SELECT "A"
+          ,"B"
+          ,"C"
+          ,"D"
+          ,"E"
+    INTO
+     V_CONDITIONAL_PROBABILITY_3_A
+    ,V_CONDITIONAL_PROBABILITY_3_B
+    ,V_CONDITIONAL_PROBABILITY_3_C
+    ,V_CONDITIONAL_PROBABILITY_3_D
+    ,V_CONDITIONAL_PROBABILITY_3_E
+    FROM "TBL_COP" WHERE "COP_LEVEL" = 3;
+    --end try
+    --begin catch
+    --			INSERT INTO ERROR_LOG (ErrorMessage,CodeLineNo,SqlName) VALUES(ERROR_MESSAGE(),ERROR_LINE(),ERROR_PROCEDURE());	
+    --end catch
+    ------ End Get Conditional Probability Details  -----
+
+    --Begin try
+    ------ Start Get Calculations Details  -----
+    V_EFFECTIVE_AGE := I_PRESENT_YEAR - V_LAST_MEASURED_YEAR_FOR_DIA_LMY;
+    V_EFFECTIVE_THK := V_LAST_MEASURED_THK_FOR_DIA_LMT;
+    --V_EFFECTIVE_AGE := I_PRESENT_YEAR - V_YEAR_IN_SERVICE;
+    --V_EFFECTIVE_THK := V_NOM_THK_NT_INCHES;
+    RAISE INFO 'V_OPTION_FOR_MIN_REQ_THK %', V_OPTION_FOR_MIN_REQ_THK;
+    IF (V_OPTION_FOR_MIN_REQ_THK = 'PrThk') THEN
+
+    	V_MIN_REQ_THK := (V_DESIGN_PRESSURE_P_PSI * (V_NOM_DIA_D_INCHES / 2) / ((V_ALLOWABLE_STRESS_PSI * I_EFFICIENCY_OF_WELD_E) - (0.6 * V_DESIGN_PRESSURE_P_PSI)));
+
+    ELSIF (V_OPTION_FOR_MIN_REQ_THK = 'NomThk-CA') THEN
+
+    	V_MIN_REQ_THK := V_NOM_THK_NT_INCHES - V_CORROSION_ALLOWANCE;
+
+    ELSIF(V_OPTION_FOR_MIN_REQ_THK = 'STRUCTURAL_MIN_THK') THEN
+
+    	V_MIN_REQ_THK := V_STRUCTURAL_MIN_THK;
+
+    END IF;
+    IF (V_INJECTION_POINTS_INTERMITENT = 'Y') THEN
+
+    	V_EFFECTIVE_CORR_RATE := V_EFFECTIVE_CORROSION_RATE * 2;
+
+    ELSE
+
+    	V_EFFECTIVE_CORR_RATE := V_EFFECTIVE_CORROSION_RATE;
+
+    END IF;
+    V_ART := (V_EFFECTIVE_CORR_RATE * (V_EFFECTIVE_AGE / V_EFFECTIVE_THK));
+    V_FLOW_STRESS := (((V_YIELD_STRENGTH_KSI + V_TENSILE_STREGTH_KSI) / 2) * 1.1 * I_EFFICIENCY_OF_WELD_E);
+    V_STENGTH_RATIO := (((V_ALLOWABLE_STRESS_PSI /1000) * I_EFFICIENCY_OF_WELD_E * V_MIN_REQ_THK )/(V_FLOW_STRESS * V_EFFECTIVE_THK));
+    ------ End Get Calculations Details  -----
+
+    ------ Start Get Inspection Effectiveness Factor Details  -----
+    V_INSPECTION_EFFECTIVENESS_1 := (V_PRP_1 *(POWER(V_CONDITIONAL_PROBABILITY_1_A ,V_VERY_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_1_B,V_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_1_C,V_MEDIUM )*POWER(V_CONDITIONAL_PROBABILITY_1_D,V_LOW )));
+    V_INSPECTION_EFFECTIVENESS_2 := (V_PRP_2 *(POWER(V_CONDITIONAL_PROBABILITY_2_A ,V_VERY_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_2_B,V_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_2_C,V_MEDIUM )*POWER(V_CONDITIONAL_PROBABILITY_2_D,V_LOW )));
+    V_INSPECTION_EFFECTIVENESS_3 := (V_PRP_3 *(POWER(V_CONDITIONAL_PROBABILITY_3_A ,V_VERY_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_3_B,V_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_3_C,V_MEDIUM )*POWER(V_CONDITIONAL_PROBABILITY_3_D,V_LOW )));
+    ------ End Get Inspection Effectiveness Factor Details  -----
+
+    ------ Start Get Calculation of Posterior Probability Details  -----
+    V_POSTERIOR_PROBABILITY_1 := (V_INSPECTION_EFFECTIVENESS_1 / (V_INSPECTION_EFFECTIVENESS_1 + V_INSPECTION_EFFECTIVENESS_2 + V_INSPECTION_EFFECTIVENESS_3));
+    V_POSTERIOR_PROBABILITY_2 := (V_INSPECTION_EFFECTIVENESS_2 / (V_INSPECTION_EFFECTIVENESS_1 + V_INSPECTION_EFFECTIVENESS_2 + V_INSPECTION_EFFECTIVENESS_3));
+    V_POSTERIOR_PROBABILITY_3 := (V_INSPECTION_EFFECTIVENESS_3 / (V_INSPECTION_EFFECTIVENESS_1 + V_INSPECTION_EFFECTIVENESS_2 + V_INSPECTION_EFFECTIVENESS_3));
+    ------ End Get Calculation of Posterior Probability Details  -----
+
+    ------ Start Get Calculation of Beta 1,2,3 Details  -----
+    V_CAL_OF_BETA_COVT := 0.2;
+    V_CAL_OF_BETA_COVSF := 0.2;
+    V_CAL_OF_BETA_COVP := 0.05;
+    V_CAL_OF_BETA_CONST_1 := 1;
+    V_CAL_OF_BETA_CONST_2 := 2;
+    V_CAL_OF_BETA_CONST_3 := 4;
+    V_CAL_OF_BETA_1 := ((POWER(V_CAL_OF_BETA_CONST_1 ,2) * POWER(V_ART ,2) * POWER(V_CAL_OF_BETA_COVT ,2))+(POWER(1-(V_CAL_OF_BETA_CONST_1 * V_ART ),2))*(POWER(V_CAL_OF_BETA_COVSF ,2))+(POWER(V_STENGTH_RATIO ,2)*POWER(V_CAL_OF_BETA_COVP ,2)));
+    V_CAL_OF_BETA_2 := ((POWER(V_CAL_OF_BETA_CONST_2 ,2) * POWER(V_ART ,2) * POWER(V_CAL_OF_BETA_COVT ,2))+(POWER(1-(V_CAL_OF_BETA_CONST_2 * V_ART ),2))*(POWER(V_CAL_OF_BETA_COVSF ,2))+(POWER(V_STENGTH_RATIO ,2)*POWER(V_CAL_OF_BETA_COVP ,2)));
+    V_CAL_OF_BETA_3 := ((POWER(V_CAL_OF_BETA_CONST_3 ,2) * POWER(V_ART ,2) * POWER(V_CAL_OF_BETA_COVT ,2))+(POWER(1-(V_CAL_OF_BETA_CONST_3 * V_ART ),2))*(POWER(V_CAL_OF_BETA_COVSF ,2))+(POWER(V_STENGTH_RATIO ,2)*POWER(V_CAL_OF_BETA_COVP ,2)));
+    V_CAL_OF_BETA_DS_VALUES_1 := ((1 - ( V_CAL_OF_BETA_CONST_1 * V_ART ) - V_STENGTH_RATIO )/SQRT(V_CAL_OF_BETA_1));
+    V_CAL_OF_BETA_DS_VALUES_2 := ((1 - ( V_CAL_OF_BETA_CONST_2 * V_ART ) - V_STENGTH_RATIO )/SQRT(V_CAL_OF_BETA_2));
+    V_CAL_OF_BETA_DS_VALUES_3 := ((1 - ( V_CAL_OF_BETA_CONST_3 * V_ART ) - V_STENGTH_RATIO )/SQRT(V_CAL_OF_BETA_3));
+    ------ End Get Calculation of Beta 1,2,3 Details  -----
+
+    ------ Start Get Calculation of Base Damage Factor & POF Details  -----
+    V_DAMAGE_FACTOR := (((((V_POSTERIOR_PROBABILITY_1 ) * udf_NORMSDIST(-(V_CAL_OF_BETA_DS_VALUES_1))) + ((V_POSTERIOR_PROBABILITY_2) * udf_NORMSDIST(-(V_CAL_OF_BETA_DS_VALUES_2)))+((V_POSTERIOR_PROBABILITY_3) * udf_NORMSDIST(-(V_CAL_OF_BETA_DS_VALUES_3))))/((0.000156))));
+    V_POF_EXPO := ((3.06* (0.00001)) * V_DAMAGE_FACTOR);
+    V_POF := abs(log(V_POF_EXPO));
+    V_AVAILABLE_THK := V_EFFECTIVE_THK - V_MIN_REQ_THK; 
+    V_REMAINING_LIFE := V_AVAILABLE_THK / V_EFFECTIVE_CORR_RATE;
+    V_HALF_LIFE := V_REMAINING_LIFE / 2;
+    -- SET V_POF_HALF_LIFE 
+    -- SET V_OVERALL_POF
+    ------ End Get Calculation of Base Damage Factor & POF Details  -----
+    --end try
+    --begin catch
+    --			INSERT INTO ERROR_LOG (ErrorMessage,CodeLineNo,SqlName) VALUES(ERROR_MESSAGE(),ERROR_LINE(),ERROR_PROCEDURE());	
+    --end catch
+
+    -- Update POF_IC details  --
+    UPDATE "POF_IC" SET "POF" = ROUND(V_POF::NUMERIC, 5), "DamageFactor"=ROUND(V_DAMAGE_FACTOR::NUMERIC, 5), "Art"=ROUND(V_ART::NUMERIC, 5), "StrengthRatio" = ROUND(V_STENGTH_RATIO::NUMERIC, 5) WHERE "EquipmentNo"=I_EQUIPMENT_NO;
+    IF EXISTS (SELECT 1 FROM "TBL_POF_IC" WHERE "EQUIPMENT_NO" = I_EQUIPMENT_NO AND "PRESENT_YEAR" = cast(I_PRESENT_YEAR AS VARCHAR)) THEN
+     UPDATE "TBL_POF_IC" SET	 	"YEAR_IN_SERVICE"						=	cast(V_YEAR_IN_SERVICE AS VARCHAR)
+    						,"NOM_DIA_D_INCHES"					=	cast(V_NOM_DIA_D_INCHES AS VARCHAR)
+    						,"NOM_THK_NT_INCHES"					=	cast(V_NOM_THK_NT_INCHES AS VARCHAR)
+    						,"DESIGN_TEMP_DEGF"					=	cast(V_DESIGN_TEMP_DEGF AS VARCHAR)
+    						,"DESIGN_PRESSURE_P_PSI"				=	cast(V_DESIGN_PRESSURE_P_PSI AS VARCHAR)
+    						,"EFFECTIVE_CORROSION_RATE"			=	cast(V_EFFECTIVE_CORROSION_RATE AS VARCHAR)
+    						,"MATERIAL_STD"						=	cast(V_MATERIAL_STD AS VARCHAR)
+    						,"MATERIAL_GRADE"						=	cast(V_MATERIAL_GRADE AS VARCHAR)
+    						,"INJECTION_POINTS_INTERMITENT"		=	cast(V_INJECTION_POINTS_INTERMITENT AS VARCHAR)
+    						,"CORROSION_ALLOWANCE"				=	cast(V_CORROSION_ALLOWANCE AS VARCHAR)
+    						,"VERY_HIGH"						=	cast(V_VERY_HIGH AS VARCHAR)
+    						,"HIGH"								=	cast(V_HIGH AS VARCHAR)
+    						,"MEDIUM"							=	cast(V_MEDIUM AS VARCHAR)
+    						,"LOW"								=	cast(V_LOW AS VARCHAR)
+    						,"NO"								=	cast(V_NO AS VARCHAR)
+    						,"LAST_MEASURED_THK_FOR_DIA_LMT"		=	cast(V_LAST_MEASURED_THK_FOR_DIA_LMT AS VARCHAR)
+    						,"LAST_MEASURED_YEAR_FOR_DIA_LMY"		=	cast(V_LAST_MEASURED_YEAR_FOR_DIA_LMY AS VARCHAR)
+    						,"YIELD_STRENGTH_KSI"					=	cast(V_YIELD_STRENGTH_KSI AS VARCHAR)
+    						,"TENSILE_STREGTH_KSI"				=	cast(V_TENSILE_STREGTH_KSI AS VARCHAR)
+    						
+    						,"EFFICIENCY_OF_WELD_E"				=	cast(I_EFFICIENCY_OF_WELD_E AS VARCHAR) 
+    						,"YOUNGS_MODULUS_Y"					=	cast(I_YOUNGS_MODULUS_Y AS VARCHAR)     
+    						,"ALLOWABLE_STRESS_PSI"				=	cast(V_ALLOWABLE_STRESS_PSI AS VARCHAR)
+    						,"PRP_1"								=	cast(V_PRP_1 AS VARCHAR)
+    						,"PRP_2"								=	cast(V_PRP_2 AS VARCHAR)
+    						,"PRP_3"								=	cast(V_PRP_3 AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_1_A"		=	cast(V_CONDITIONAL_PROBABILITY_1_A AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_1_B"		=	cast(V_CONDITIONAL_PROBABILITY_1_B AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_1_C"		=	cast(V_CONDITIONAL_PROBABILITY_1_C AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_1_D"		=	cast(V_CONDITIONAL_PROBABILITY_1_D AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_1_E"		=	cast(V_CONDITIONAL_PROBABILITY_1_E AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_2_A"		=	cast(V_CONDITIONAL_PROBABILITY_2_A AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_2_B"		=	cast(V_CONDITIONAL_PROBABILITY_2_B AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_2_C"		=	cast(V_CONDITIONAL_PROBABILITY_2_C AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_2_D"		=	cast(V_CONDITIONAL_PROBABILITY_2_D AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_2_E"		=	cast(V_CONDITIONAL_PROBABILITY_2_E AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_3_A"		=	cast(V_CONDITIONAL_PROBABILITY_3_A AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_3_B"		=	cast(V_CONDITIONAL_PROBABILITY_3_B AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_3_C"		=	cast(V_CONDITIONAL_PROBABILITY_3_C AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_3_D"		=	cast(V_CONDITIONAL_PROBABILITY_3_D AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_3_E"		=	cast(V_CONDITIONAL_PROBABILITY_3_E AS VARCHAR)
+    						,"EFFECTIVE_THK"						=	cast(V_EFFECTIVE_THK AS VARCHAR)						
+    						,"EFFECTIVE_AGE"						=	cast(V_EFFECTIVE_AGE AS VARCHAR)						
+    						,"MIN_REQ_THK"						=	cast(V_MIN_REQ_THK AS VARCHAR)						
+    						,"EFFECTIVE_CORR_RATE"				=	cast(V_EFFECTIVE_CORR_RATE AS VARCHAR)				
+    						,"ART"								=	cast(V_ART AS VARCHAR)								
+    						,"FLOW_STRESS"						=	cast(V_FLOW_STRESS AS VARCHAR)					
+    						,"STENGTH_RATIO"						=	cast(V_STENGTH_RATIO AS VARCHAR)						
+    						,"INSPECTION_EFFECTIVENESS_1"			=	cast(V_INSPECTION_EFFECTIVENESS_1 AS VARCHAR)			
+    						,"INSPECTION_EFFECTIVENESS_2"			=	cast(V_INSPECTION_EFFECTIVENESS_2 AS VARCHAR)			
+    						,"INSPECTION_EFFECTIVENESS_3"			=	cast(V_INSPECTION_EFFECTIVENESS_3 AS VARCHAR)			
+    						,"POSTERIOR_PROBABILITY_1"			=	cast(V_POSTERIOR_PROBABILITY_1 AS VARCHAR)			
+    						,"POSTERIOR_PROBABILITY_2"			=	cast(V_POSTERIOR_PROBABILITY_2 AS VARCHAR)			
+    						,"POSTERIOR_PROBABILITY_3"			=	cast(V_POSTERIOR_PROBABILITY_3 AS VARCHAR)			
+    						,"CAL_OF_BETA_COVT"					=	cast(V_CAL_OF_BETA_COVT AS VARCHAR)					
+    						,"CAL_OF_BETA_COVSF"					=	cast(V_CAL_OF_BETA_COVSF AS VARCHAR)					
+    						,"CAL_OF_BETA_COVP"					=	cast(V_CAL_OF_BETA_COVP AS VARCHAR)					
+    						,"CAL_OF_BETA_CONST_1"				=	cast(V_CAL_OF_BETA_CONST_1 AS VARCHAR)				
+    						,"CAL_OF_BETA_CONST_2"				=	cast(V_CAL_OF_BETA_CONST_2 AS VARCHAR)				
+    						,"CAL_OF_BETA_CONST_3"				=	cast(V_CAL_OF_BETA_CONST_3 AS VARCHAR)				
+    						,"CAL_OF_BETA_1"						=	cast(V_CAL_OF_BETA_1 AS VARCHAR)						
+    						,"CAL_OF_BETA_2"						=	cast(V_CAL_OF_BETA_2 AS VARCHAR)						
+    						,"CAL_OF_BETA_3"						=	cast(V_CAL_OF_BETA_3 AS VARCHAR)						
+    						,"CAL_OF_BETA_DS_VALUES_1"			=	cast(V_CAL_OF_BETA_DS_VALUES_1 AS VARCHAR)			
+    						,"CAL_OF_BETA_DS_VALUES_2"			=	cast(V_CAL_OF_BETA_DS_VALUES_2 AS VARCHAR)			
+    						,"CAL_OF_BETA_DS_VALUES_3"			=	cast(V_CAL_OF_BETA_DS_VALUES_3 AS VARCHAR)			
+    						,"DAMAGE_FACTOR"						=	cast(ROUND(V_DAMAGE_FACTOR::NUMERIC, 5) AS VARCHAR)						
+    						,"POF"								=	cast(ROUND(V_POF::NUMERIC) AS VARCHAR)								
+    						,"POF_EXPO"							=	cast(ROUND(V_POF_EXPO::NUMERIC, 5) AS VARCHAR)							
+    						,"AVAILABLE_THK"						=	cast(V_AVAILABLE_THK AS VARCHAR)						
+    						,"REMAINING_LIFE"						=	cast(V_REMAINING_LIFE AS VARCHAR)						
+    						,"HALF_LIFE"							=	cast(V_HALF_LIFE AS VARCHAR)						
+    						,"POF_HALF_LIFE"						=	cast(V_POF_HALF_LIFE AS VARCHAR)						
+    						,"OVERALL_POF"						=	cast(V_OVERALL_POF  AS VARCHAR)		
+    						,"USE_LICR"                         =   V_USE_LICR
+    ,"USE_SICR"                                                 =   V_USE_SICR
+    ,"THEORETICAL_CORROSION_RATE_TICR"                              = cast(V_THEORETICAL_CORROSION_RATE_TICR  AS VARCHAR)
+    ,"MEASURED_LONGTERM_CORROSION_RATE_LICR"                    = cast(V_MEASURED_LONGTERM_CORROSION_RATE_LICR   AS VARCHAR)
+    ,"MEASURED_SHORTTERM_CORROSION_RATE_SICR"                    = cast(V_MEASURED_SHORTTERM_CORROSION_RATE_SICR   AS VARCHAR)
+    						,"ModifiedDate"                     = NOW()
+    						,"ModifiedBy"                     = 'SYSADMIN'
+    WHERE "EQUIPMENT_NO" = I_EQUIPMENT_NO AND "PRESENT_YEAR" = cast(I_PRESENT_YEAR AS VARCHAR); 
+    ELSE
+    INSERT INTO "TBL_POF_IC" (	
+    "EQUIPMENT_NO"
+    ,"PRESENT_YEAR"
+    ,"CORROSION_TYPE"
+    ,"YEAR_IN_SERVICE"								
+    ,"NOM_DIA_D_INCHES"								
+    ,"NOM_THK_NT_INCHES"							
+    ,"DESIGN_TEMP_DEGF"								
+    ,"DESIGN_PRESSURE_P_PSI"						
+    ,"EFFECTIVE_CORROSION_RATE"						
+    ,"MATERIAL_STD"									
+    ,"MATERIAL_GRADE"								
+    ,"INJECTION_POINTS_INTERMITENT"					
+    ,"CORROSION_ALLOWANCE"							
+    ,"VERY_HIGH"									
+    ,"HIGH"											
+    ,"MEDIUM"										
+    ,"LOW"											
+    ,"NO"											
+    ,"LAST_MEASURED_THK_FOR_DIA_LMT"				
+    ,"LAST_MEASURED_YEAR_FOR_DIA_LMY"				
+    ,"YIELD_STRENGTH_KSI"							
+    ,"TENSILE_STREGTH_KSI"									
+    ,"EFFICIENCY_OF_WELD_E"							
+    ,"YOUNGS_MODULUS_Y"								
+    ,"ALLOWABLE_STRESS_PSI"							
+    ,"PRP_1"										
+    ,"PRP_2"										
+    ,"PRP_3"										
+    ,"CONDITIONAL_PROBABILITY_1_A"					
+    ,"CONDITIONAL_PROBABILITY_1_B"					
+    ,"CONDITIONAL_PROBABILITY_1_C"					
+    ,"CONDITIONAL_PROBABILITY_1_D"					
+    ,"CONDITIONAL_PROBABILITY_1_E"			        
+    ,"CONDITIONAL_PROBABILITY_2_A"			        
+    ,"CONDITIONAL_PROBABILITY_2_B"			        
+    ,"CONDITIONAL_PROBABILITY_2_C"			        
+    ,"CONDITIONAL_PROBABILITY_2_D"			        
+    ,"CONDITIONAL_PROBABILITY_2_E"			        
+    ,"CONDITIONAL_PROBABILITY_3_A"			        
+    ,"CONDITIONAL_PROBABILITY_3_B"			        
+    ,"CONDITIONAL_PROBABILITY_3_C"			        
+    ,"CONDITIONAL_PROBABILITY_3_D"			        
+    ,"CONDITIONAL_PROBABILITY_3_E"			        
+    ,"EFFECTIVE_THK"						        	
+    ,"EFFECTIVE_AGE"						        	
+    ,"MIN_REQ_THK"							        
+    ,"EFFECTIVE_CORR_RATE"					        
+    ,"ART"									        
+    ,"FLOW_STRESS"							        
+    ,"STENGTH_RATIO"						        	
+    ,"INSPECTION_EFFECTIVENESS_1"			        	
+    ,"INSPECTION_EFFECTIVENESS_2"			        	
+    ,"INSPECTION_EFFECTIVENESS_3"			        	
+    ,"POSTERIOR_PROBABILITY_1"				        
+    ,"POSTERIOR_PROBABILITY_2"				        
+    ,"POSTERIOR_PROBABILITY_3"				        
+    ,"CAL_OF_BETA_COVT"						        
+    ,"CAL_OF_BETA_COVSF"					        	
+    ,"CAL_OF_BETA_COVP"						        
+    ,"CAL_OF_BETA_CONST_1"					        
+    ,"CAL_OF_BETA_CONST_2"					        
+    ,"CAL_OF_BETA_CONST_3"					        
+    ,"CAL_OF_BETA_1"						        	
+    ,"CAL_OF_BETA_2"						        	
+    ,"CAL_OF_BETA_3"						        	
+    ,"CAL_OF_BETA_DS_VALUES_1"				        
+    ,"CAL_OF_BETA_DS_VALUES_2"				        
+    ,"CAL_OF_BETA_DS_VALUES_3"				        
+    ,"DAMAGE_FACTOR"
+    ,"POF_EXPO"							        	
+    ,"POF"        
+    ,"AVAILABLE_THK"						        	
+    ,"REMAINING_LIFE"						        	
+    ,"HALF_LIFE"							        
+    ,"POF_HALF_LIFE"						        	
+    ,"OVERALL_POF"	
+    ,"USE_LICR" 
+    ,"USE_SICR" 
+    ,"THEORETICAL_CORROSION_RATE_TICR" 
+    ,"MEASURED_LONGTERM_CORROSION_RATE_LICR"
+    ,"MEASURED_SHORTTERM_CORROSION_RATE_SICR" 	
+    ,"CreatedDate"                     	        
+    ,"CreatedBy" 	
+    )
+    VALUES(
+    I_EQUIPMENT_NO
+    ,cast(I_PRESENT_YEAR AS VARCHAR)
+    ,'IC'	
+    ,cast(V_YEAR_IN_SERVICE AS VARCHAR)						
+    ,cast(V_NOM_DIA_D_INCHES AS VARCHAR)
+    ,cast(V_NOM_THK_NT_INCHES AS VARCHAR)
+    ,cast(V_DESIGN_TEMP_DEGF AS VARCHAR)
+    ,cast(V_DESIGN_PRESSURE_P_PSI AS VARCHAR)
+    ,cast(V_EFFECTIVE_CORROSION_RATE AS VARCHAR)
+    ,cast(V_MATERIAL_STD AS VARCHAR)
+    ,cast(V_MATERIAL_GRADE AS VARCHAR)
+    ,cast(V_INJECTION_POINTS_INTERMITENT AS VARCHAR)
+    ,cast(V_CORROSION_ALLOWANCE AS VARCHAR)
+    ,cast(V_VERY_HIGH AS VARCHAR)
+    ,cast(V_HIGH AS VARCHAR)
+    ,cast(V_MEDIUM AS VARCHAR)
+    ,cast(V_LOW AS VARCHAR)
+    ,cast(V_NO AS VARCHAR)
+    ,cast(V_LAST_MEASURED_THK_FOR_DIA_LMT AS VARCHAR)
+    ,cast(V_LAST_MEASURED_YEAR_FOR_DIA_LMY AS VARCHAR)
+    ,cast(V_YIELD_STRENGTH_KSI AS VARCHAR)
+    ,cast(V_TENSILE_STREGTH_KSI AS VARCHAR)				
+    ,cast(I_EFFICIENCY_OF_WELD_E AS VARCHAR) 
+    ,cast(I_YOUNGS_MODULUS_Y AS VARCHAR)     
+    ,cast(V_ALLOWABLE_STRESS_PSI AS VARCHAR)
+    ,cast(V_PRP_1 AS VARCHAR)
+    ,cast(V_PRP_2 AS VARCHAR)
+    ,cast(V_PRP_3 AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_1_A AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_1_B AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_1_C AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_1_D AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_1_E AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_2_A AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_2_B AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_2_C AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_2_D AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_2_E AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_3_A AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_3_B AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_3_C AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_3_D AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_3_E AS VARCHAR)
+    ,cast(V_EFFECTIVE_THK AS VARCHAR)					
+    ,cast(V_EFFECTIVE_AGE AS VARCHAR)					
+    ,cast(V_MIN_REQ_THK AS VARCHAR)						
+    ,cast(V_EFFECTIVE_CORR_RATE AS VARCHAR)				
+    ,cast(V_ART AS VARCHAR)								
+    ,cast(V_FLOW_STRESS AS VARCHAR)					
+    ,cast(V_STENGTH_RATIO AS VARCHAR)					
+    ,cast(V_INSPECTION_EFFECTIVENESS_1 AS VARCHAR)		
+    ,cast(V_INSPECTION_EFFECTIVENESS_2 AS VARCHAR)		
+    ,cast(V_INSPECTION_EFFECTIVENESS_3 AS VARCHAR)		
+    ,cast(V_POSTERIOR_PROBABILITY_1 AS VARCHAR)			
+    ,cast(V_POSTERIOR_PROBABILITY_2 AS VARCHAR)			
+    ,cast(V_POSTERIOR_PROBABILITY_3 AS VARCHAR)			
+    ,cast(V_CAL_OF_BETA_COVT AS VARCHAR)					
+    ,cast(V_CAL_OF_BETA_COVSF AS VARCHAR)				
+    ,cast(V_CAL_OF_BETA_COVP AS VARCHAR)					
+    ,cast(V_CAL_OF_BETA_CONST_1 AS VARCHAR)				
+    ,cast(V_CAL_OF_BETA_CONST_2 AS VARCHAR)				
+    ,cast(V_CAL_OF_BETA_CONST_3 AS VARCHAR)				
+    ,cast(V_CAL_OF_BETA_1 AS VARCHAR)					
+    ,cast(V_CAL_OF_BETA_2 AS VARCHAR)					
+    ,cast(V_CAL_OF_BETA_3 AS VARCHAR)					
+    ,cast(V_CAL_OF_BETA_DS_VALUES_1 AS VARCHAR)			
+    ,cast(V_CAL_OF_BETA_DS_VALUES_2 AS VARCHAR)			
+    ,cast(V_CAL_OF_BETA_DS_VALUES_3 AS VARCHAR)			
+    ,cast(V_DAMAGE_FACTOR AS VARCHAR)					
+    ,cast(ROUND(V_POF_EXPO::NUMERIC, 5) AS VARCHAR)								
+    ,cast(ROUND(V_POF::NUMERIC) AS VARCHAR)							
+    ,cast(V_AVAILABLE_THK AS VARCHAR)					
+    ,cast(V_REMAINING_LIFE AS VARCHAR)					
+    ,cast(V_HALF_LIFE AS VARCHAR)						
+    ,cast(V_POF_HALF_LIFE AS VARCHAR)					
+    ,cast(V_OVERALL_POF  AS VARCHAR)
+    ,V_USE_LICR 
+    ,V_USE_SICR 
+    ,cast(ROUND(V_THEORETICAL_CORROSION_RATE_TICR::NUMERIC, 5)   AS VARCHAR)  
+    ,cast(ROUND(V_MEASURED_LONGTERM_CORROSION_RATE_LICR::NUMERIC, 5)   AS VARCHAR)
+    ,cast(ROUND(V_MEASURED_SHORTTERM_CORROSION_RATE_SICR::NUMERIC, 5)   AS VARCHAR)
+    ,NOW()
+    ,'SYSADMIN'
+    );
+
+    END IF;
+    END;
+    $BODY$ ;
+
+    --CALL sp_upd_pof_ic ('P01.AL1001',2027);
+
+    -- POF EC calculation
+
+    CREATE OR REPLACE PROCEDURE SP_UPD_POF_EC(I_EQUIPMENT_NO VARCHAR(25)
+    ,I_PRESENT_YEAR NUMERIC
+    )
+    LANGUAGE plpgsql    
+    AS $BODY$ 
+
+    DECLARE 
+    V_CNT	INT;
+    V_YEAR_IN_SERVICE  NUMERIC;
+    V_NOM_DIA_D_INCHES NUMERIC;
+    V_NOM_THK_NT_INCHES NUMERIC;
+    V_DESIGN_TEMP_DEGF NUMERIC;
+    V_DESIGN_PRESSURE_P_PSI NUMERIC;
+    V_EFFECTIVE_CORROSION_RATE NUMERIC;
+    V_MATERIAL_STD VARCHAR(32);
+    V_MATERIAL_GRADE VARCHAR(32);
+    V_INJECTION_POINTS_INTERMITENT VARCHAR(1);
+    V_CORROSION_ALLOWANCE NUMERIC;
+    V_STRUCTURAL_MIN_THK NUMERIC;
+    V_OPTION_FOR_MIN_REQ_THK VARCHAR(100);
+    I_EFFICIENCY_OF_WELD_E  NUMERIC;
+    I_YOUNGS_MODULUS_Y     NUMERIC;
+    V_VERY_HIGH INT;
+    V_HIGH INT;
+    V_MEDIUM INT;
+    V_LOW INT;
+    V_NO INT;
+    V_USE_LICR VARCHAR(1);
+    V_USE_SICR VARCHAR(1);
+    V_THEORETICAL_CORROSION_RATE_TICR NUMERIC;
+    V_MEASURED_LONGTERM_CORROSION_RATE_LICR NUMERIC;
+    V_MEASURED_SHORTTERM_CORROSION_RATE_SICR NUMERIC;
+
+    V_LAST_MEASURED_THK_FOR_DIA_LMT NUMERIC;
+    V_LAST_MEASURED_YEAR_FOR_DIA_LMY NUMERIC;
+
+    V_YIELD_STRENGTH_KSI NUMERIC;
+    V_TENSILE_STREGTH_KSI NUMERIC;
+    V_EFFICIENCY_OF_WELD_E NUMERIC;
+    V_YOUNGS_MODULUS_Y NUMERIC;
+    V_ALLOWABLE_STRESS_PSI NUMERIC;
+
+    V_PRP_CONFIDENCE VARCHAR(15);
+    V_PRP_1 NUMERIC;
+    V_PRP_2 NUMERIC;
+    V_PRP_3 NUMERIC;
+
+    V_CONDITIONAL_PROBABILITY_1_A NUMERIC;
+    V_CONDITIONAL_PROBABILITY_1_B NUMERIC;
+    V_CONDITIONAL_PROBABILITY_1_C NUMERIC;
+    V_CONDITIONAL_PROBABILITY_1_D NUMERIC;
+    V_CONDITIONAL_PROBABILITY_1_E NUMERIC;
+    V_CONDITIONAL_PROBABILITY_2_A NUMERIC;
+    V_CONDITIONAL_PROBABILITY_2_B NUMERIC;
+    V_CONDITIONAL_PROBABILITY_2_C NUMERIC;
+    V_CONDITIONAL_PROBABILITY_2_D NUMERIC;
+    V_CONDITIONAL_PROBABILITY_2_E NUMERIC;
+    V_CONDITIONAL_PROBABILITY_3_A NUMERIC;
+    V_CONDITIONAL_PROBABILITY_3_B NUMERIC;
+    V_CONDITIONAL_PROBABILITY_3_C NUMERIC;
+    V_CONDITIONAL_PROBABILITY_3_D NUMERIC;
+    V_CONDITIONAL_PROBABILITY_3_E NUMERIC;
+
+    V_EFFECTIVE_AGE NUMERIC;
+    V_EFFECTIVE_THK NUMERIC;
+    V_MIN_REQ_THK NUMERIC;
+    V_EFFECTIVE_CORR_RATE NUMERIC;
+    V_ART NUMERIC;
+    V_FLOW_STRESS NUMERIC;
+    V_STENGTH_RATIO NUMERIC;
+    V_INSPECTION_EFFECTIVENESS_1 NUMERIC;
+    V_INSPECTION_EFFECTIVENESS_2 NUMERIC;
+    V_INSPECTION_EFFECTIVENESS_3 NUMERIC;
+    V_POSTERIOR_PROBABILITY_1 NUMERIC;
+    V_POSTERIOR_PROBABILITY_2 NUMERIC;
+    V_POSTERIOR_PROBABILITY_3 NUMERIC;
+    V_CAL_OF_BETA_COVT NUMERIC;
+    V_CAL_OF_BETA_COVSF NUMERIC;
+    V_CAL_OF_BETA_COVP NUMERIC;
+    V_CAL_OF_BETA_CONST_1 NUMERIC;
+    V_CAL_OF_BETA_CONST_2 NUMERIC;
+    V_CAL_OF_BETA_CONST_3 NUMERIC;
+    V_CAL_OF_BETA_1 NUMERIC;
+    V_CAL_OF_BETA_2 NUMERIC;
+    V_CAL_OF_BETA_3 NUMERIC;
+    V_CAL_OF_BETA_DS_VALUES_1 NUMERIC;
+    V_CAL_OF_BETA_DS_VALUES_2 NUMERIC;
+    V_CAL_OF_BETA_DS_VALUES_3 NUMERIC;
+    V_DAMAGE_FACTOR NUMERIC;
+    V_POF NUMERIC;
+    V_POF_EXPO NUMERIC;
+    V_AVAILABLE_THK NUMERIC;
+    V_REMAINING_LIFE NUMERIC;
+    V_HALF_LIFE NUMERIC;
+    V_POF_HALF_LIFE NUMERIC;
+    V_OVERALL_POF NUMERIC;
+    V_YIELD_STRENGTH_KSI1 VARCHAR(32);
+    BEGIN
+    V_CNT := 10;
+    RAISE INFO 'V_CNT %',V_CNT ;
+    ------ Start Get Pipe Master Details  -----
+
+
+    SELECT	
+    "YearInService"
+    ,"NominalDiameter"
+    ,"NominalThick"
+    ,"DesignTemperature"
+    ,"DesignPressure"
+    ,0
+    ,"MaterialStd"
+    ,"MaterialGrade"
+    ,'N'
+    ,"CorrosionAllowance"
+    ,"LastMeasuredThick_LMT"
+    ,"LastMeasuredYear_LMY"
+    ,'"LOW"'
+    ,"StructuralMinThk_SMT"
+    ,"MinReqThkOption_MRTO"
+    ,"JointEfficiency"
+    ,1
+    ,"AllowableStressMPA_S"
+    ,"YieldStrengthMPA_YS"
+    ,"TensileStrengthMPA_TS"
+
+    INTO
+    		 V_YEAR_IN_SERVICE
+    		,V_NOM_DIA_D_INCHES 
+    		,V_NOM_THK_NT_INCHES
+    		,V_DESIGN_TEMP_DEGF
+    		,V_DESIGN_PRESSURE_P_PSI
+    		,V_EFFECTIVE_CORROSION_RATE
+    		,V_MATERIAL_STD
+    		,V_MATERIAL_GRADE
+    		,V_INJECTION_POINTS_INTERMITENT
+    		,V_CORROSION_ALLOWANCE
+    		,V_LAST_MEASURED_THK_FOR_DIA_LMT
+    		,V_LAST_MEASURED_YEAR_FOR_DIA_LMY
+    		,V_PRP_CONFIDENCE
+    		,V_STRUCTURAL_MIN_THK
+    		,V_OPTION_FOR_MIN_REQ_THK
+    		,I_EFFICIENCY_OF_WELD_E
+    		,I_YOUNGS_MODULUS_Y
+    		,V_ALLOWABLE_STRESS_PSI
+    		,V_YIELD_STRENGTH_KSI
+    		,V_TENSILE_STREGTH_KSI
+            	
+    FROM "PipeMaster" WHERE "EquipmentNo" = UPPER(TRIM(I_EQUIPMENT_NO));
+    ------ End Get Pipe Master Details  -----
+
+    ------ Start Get Inspection Confidence Details  -----
+
+     SELECT "VeryHigh"
+          ,"High"
+          ,"Medium"
+          ,"Low"
+          ,"Found"
+    	  ,"EffectiveCR"
+    	  ,'N'
+    	  ,"UseMeasuredLCR"
+    	  ,"UseMeasuredSCR"
+    	  ,"TheoriticalCR"
+    	  ,"MeasuredLCR"
+    	  ,"MeasuredSCR"
+    	  ,"EffectiveAge"
+    	  INTO
+    	  V_VERY_HIGH, V_HIGH, V_MEDIUM, V_LOW, V_NO
+    	  ,V_EFFECTIVE_CORROSION_RATE
+    	  ,V_INJECTION_POINTS_INTERMITENT
+    	  ,V_USE_LICR 
+    	  ,V_USE_SICR 
+          ,V_THEORETICAL_CORROSION_RATE_TICR 
+          ,V_MEASURED_LONGTERM_CORROSION_RATE_LICR 
+          ,V_MEASURED_SHORTTERM_CORROSION_RATE_SICR 
+    	  ,V_EFFECTIVE_AGE	
+    FROM "POF_EC"  WHERE "EquipmentNo" = UPPER(TRIM(I_EQUIPMENT_NO));  
+    ------ End Get Inspection Confidence Details  -----
+
+    ------ Start Get PRP Details  -----
+    --Begin try
+    SELECT "PRP_1"
+          ,"PRP_2"
+          ,"PRP_3"
+    INTO
+     V_PRP_1
+    ,V_PRP_2
+    ,V_PRP_3
+    FROM "TBL_PRP" WHERE "PRP_CONFIDENCE" = 'LOW';  --V_PRP_CONFIDENCE;
+    --end try
+    --begin catch
+    --			INSERT INTO ERROR_LOG (ErrorMessage,CodeLineNo,SqlName) VALUES(ERROR_MESSAGE(),ERROR_LINE(),ERROR_PROCEDURE());	
+    --end catch
+    ------ End Get PRP Details  -----
+
+    ------ Start Get Conditional Probability Details  -----
+    --Begin try
+    SELECT "A"
+          ,"B"
+          ,"C"
+          ,"D"
+          ,"E"
+    INTO
+    V_CONDITIONAL_PROBABILITY_1_A
+    ,V_CONDITIONAL_PROBABILITY_1_B
+    ,V_CONDITIONAL_PROBABILITY_1_C
+    ,V_CONDITIONAL_PROBABILITY_1_D
+    ,V_CONDITIONAL_PROBABILITY_1_E
+    FROM "TBL_COP" WHERE "COP_LEVEL" = 1;
+
+    SELECT "A"
+          ,"B"
+          ,"C"
+          ,"D"
+          ,"E"
+    INTO
+     V_CONDITIONAL_PROBABILITY_2_A
+    ,V_CONDITIONAL_PROBABILITY_2_B
+    ,V_CONDITIONAL_PROBABILITY_2_C
+    ,V_CONDITIONAL_PROBABILITY_2_D
+    ,V_CONDITIONAL_PROBABILITY_2_E
+    FROM "TBL_COP" WHERE "COP_LEVEL" = 2;
+
+    SELECT "A"
+          ,"B"
+          ,"C"
+          ,"D"
+          ,"E"
+    INTO
+     V_CONDITIONAL_PROBABILITY_3_A
+    ,V_CONDITIONAL_PROBABILITY_3_B
+    ,V_CONDITIONAL_PROBABILITY_3_C
+    ,V_CONDITIONAL_PROBABILITY_3_D
+    ,V_CONDITIONAL_PROBABILITY_3_E
+    FROM "TBL_COP" WHERE "COP_LEVEL" = 3;
+    --end try
+    --begin catch
+    --			INSERT INTO ERROR_LOG (ErrorMessage,CodeLineNo,SqlName) VALUES(ERROR_MESSAGE(),ERROR_LINE(),ERROR_PROCEDURE());	
+    --end catch
+    ------ End Get Conditional Probability Details  -----
+
+    --Begin try
+    ------ Start Get Calculations Details  -----
+    --V_EFFECTIVE_AGE := I_PRESENT_YEAR - V_LAST_MEASURED_YEAR_FOR_DIA_LMY;
+    V_EFFECTIVE_THK := V_LAST_MEASURED_THK_FOR_DIA_LMT;
+    --V_EFFECTIVE_AGE := I_PRESENT_YEAR - V_YEAR_IN_SERVICE;
+    --V_EFFECTIVE_THK := V_NOM_THK_NT_INCHES;
+    RAISE INFO 'V_OPTION_FOR_MIN_REQ_THK %', V_OPTION_FOR_MIN_REQ_THK;
+    IF (V_OPTION_FOR_MIN_REQ_THK = 'PrThk') THEN
+
+    	V_MIN_REQ_THK := (V_DESIGN_PRESSURE_P_PSI * (V_NOM_DIA_D_INCHES / 2) / ((V_ALLOWABLE_STRESS_PSI * I_EFFICIENCY_OF_WELD_E) - (0.6 * V_DESIGN_PRESSURE_P_PSI)));
+
+    ELSIF (V_OPTION_FOR_MIN_REQ_THK = 'NomThk-CA') THEN
+
+    	V_MIN_REQ_THK := V_NOM_THK_NT_INCHES - V_CORROSION_ALLOWANCE;
+
+    ELSIF(V_OPTION_FOR_MIN_REQ_THK = 'STRUCTURAL_MIN_THK') THEN
+
+    	V_MIN_REQ_THK := V_STRUCTURAL_MIN_THK;
+
+    END IF;
+    IF (V_INJECTION_POINTS_INTERMITENT = 'Y') THEN
+
+    	V_EFFECTIVE_CORR_RATE := V_EFFECTIVE_CORROSION_RATE * 2;
+
+    ELSE
+
+    	V_EFFECTIVE_CORR_RATE := V_EFFECTIVE_CORROSION_RATE;
+
+    END IF;
+    V_ART := (V_EFFECTIVE_CORR_RATE * (V_EFFECTIVE_AGE / V_EFFECTIVE_THK));
+    V_FLOW_STRESS := (((V_YIELD_STRENGTH_KSI + V_TENSILE_STREGTH_KSI) / 2) * 1.1 * I_EFFICIENCY_OF_WELD_E);
+    V_STENGTH_RATIO := (((V_ALLOWABLE_STRESS_PSI /1000) * I_EFFICIENCY_OF_WELD_E * V_MIN_REQ_THK )/(V_FLOW_STRESS * V_EFFECTIVE_THK));
+    ------ End Get Calculations Details  -----
+
+    ------ Start Get Inspection Effectiveness Factor Details  -----
+    V_INSPECTION_EFFECTIVENESS_1 := (V_PRP_1 *(POWER(V_CONDITIONAL_PROBABILITY_1_A ,V_VERY_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_1_B,V_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_1_C,V_MEDIUM )*POWER(V_CONDITIONAL_PROBABILITY_1_D,V_LOW )));
+    V_INSPECTION_EFFECTIVENESS_2 := (V_PRP_2 *(POWER(V_CONDITIONAL_PROBABILITY_2_A ,V_VERY_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_2_B,V_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_2_C,V_MEDIUM )*POWER(V_CONDITIONAL_PROBABILITY_2_D,V_LOW )));
+    V_INSPECTION_EFFECTIVENESS_3 := (V_PRP_3 *(POWER(V_CONDITIONAL_PROBABILITY_3_A ,V_VERY_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_3_B,V_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_3_C,V_MEDIUM )*POWER(V_CONDITIONAL_PROBABILITY_3_D,V_LOW )));
+    ------ End Get Inspection Effectiveness Factor Details  -----
+
+    ------ Start Get Calculation of Posterior Probability Details  -----
+    V_POSTERIOR_PROBABILITY_1 := (V_INSPECTION_EFFECTIVENESS_1 / (V_INSPECTION_EFFECTIVENESS_1 + V_INSPECTION_EFFECTIVENESS_2 + V_INSPECTION_EFFECTIVENESS_3));
+    V_POSTERIOR_PROBABILITY_2 := (V_INSPECTION_EFFECTIVENESS_2 / (V_INSPECTION_EFFECTIVENESS_1 + V_INSPECTION_EFFECTIVENESS_2 + V_INSPECTION_EFFECTIVENESS_3));
+    V_POSTERIOR_PROBABILITY_3 := (V_INSPECTION_EFFECTIVENESS_3 / (V_INSPECTION_EFFECTIVENESS_1 + V_INSPECTION_EFFECTIVENESS_2 + V_INSPECTION_EFFECTIVENESS_3));
+    ------ End Get Calculation of Posterior Probability Details  -----
+
+    ------ Start Get Calculation of Beta 1,2,3 Details  -----
+    V_CAL_OF_BETA_COVT := 0.2;
+    V_CAL_OF_BETA_COVSF := 0.2;
+    V_CAL_OF_BETA_COVP := 0.05;
+    V_CAL_OF_BETA_CONST_1 := 1;
+    V_CAL_OF_BETA_CONST_2 := 2;
+    V_CAL_OF_BETA_CONST_3 := 4;
+    V_CAL_OF_BETA_1 := ((POWER(V_CAL_OF_BETA_CONST_1 ,2) * POWER(V_ART ,2) * POWER(V_CAL_OF_BETA_COVT ,2))+(POWER(1-(V_CAL_OF_BETA_CONST_1 * V_ART ),2))*(POWER(V_CAL_OF_BETA_COVSF ,2))+(POWER(V_STENGTH_RATIO ,2)*POWER(V_CAL_OF_BETA_COVP ,2)));
+    V_CAL_OF_BETA_2 := ((POWER(V_CAL_OF_BETA_CONST_2 ,2) * POWER(V_ART ,2) * POWER(V_CAL_OF_BETA_COVT ,2))+(POWER(1-(V_CAL_OF_BETA_CONST_2 * V_ART ),2))*(POWER(V_CAL_OF_BETA_COVSF ,2))+(POWER(V_STENGTH_RATIO ,2)*POWER(V_CAL_OF_BETA_COVP ,2)));
+    V_CAL_OF_BETA_3 := ((POWER(V_CAL_OF_BETA_CONST_3 ,2) * POWER(V_ART ,2) * POWER(V_CAL_OF_BETA_COVT ,2))+(POWER(1-(V_CAL_OF_BETA_CONST_3 * V_ART ),2))*(POWER(V_CAL_OF_BETA_COVSF ,2))+(POWER(V_STENGTH_RATIO ,2)*POWER(V_CAL_OF_BETA_COVP ,2)));
+    V_CAL_OF_BETA_DS_VALUES_1 := ((1 - ( V_CAL_OF_BETA_CONST_1 * V_ART ) - V_STENGTH_RATIO )/SQRT(V_CAL_OF_BETA_1));
+    V_CAL_OF_BETA_DS_VALUES_2 := ((1 - ( V_CAL_OF_BETA_CONST_2 * V_ART ) - V_STENGTH_RATIO )/SQRT(V_CAL_OF_BETA_2));
+    V_CAL_OF_BETA_DS_VALUES_3 := ((1 - ( V_CAL_OF_BETA_CONST_3 * V_ART ) - V_STENGTH_RATIO )/SQRT(V_CAL_OF_BETA_3));
+    ------ End Get Calculation of Beta 1,2,3 Details  -----
+
+    ------ Start Get Calculation of Base Damage Factor & POF Details  -----
+    V_DAMAGE_FACTOR := (((((V_POSTERIOR_PROBABILITY_1 ) * udf_NORMSDIST(-(V_CAL_OF_BETA_DS_VALUES_1))) + ((V_POSTERIOR_PROBABILITY_2) * udf_NORMSDIST(-(V_CAL_OF_BETA_DS_VALUES_2)))+((V_POSTERIOR_PROBABILITY_3) * udf_NORMSDIST(-(V_CAL_OF_BETA_DS_VALUES_3))))/((0.000156))));
+
+    V_POF_EXPO := ((3.06* (0.00001)) * V_DAMAGE_FACTOR);
+    V_POF := abs(log(V_POF_EXPO));
+    V_AVAILABLE_THK := V_EFFECTIVE_THK - V_MIN_REQ_THK; 
+    V_REMAINING_LIFE := V_AVAILABLE_THK / V_EFFECTIVE_CORR_RATE;
+    V_HALF_LIFE := V_REMAINING_LIFE / 2;
+    -- SET V_POF_HALF_LIFE 
+    -- SET V_OVERALL_POF
+    ------ End Get Calculation of Base Damage Factor & POF Details  -----
+    --end try
+    --begin catch
+    --			INSERT INTO ERROR_LOG (ErrorMessage,CodeLineNo,SqlName) VALUES(ERROR_MESSAGE(),ERROR_LINE(),ERROR_PROCEDURE());	
+    --end catch
+
+    -- Update POF_IC details  --
+    UPDATE "POF_EC" SET "POF" = ROUND(V_POF::NUMERIC, 5), "DamageFactor"=ROUND(V_DAMAGE_FACTOR::NUMERIC, 5), "Art"=ROUND(V_ART::NUMERIC, 5), "StrengthRatio" = ROUND(V_STENGTH_RATIO::NUMERIC, 5) WHERE "EquipmentNo"=I_EQUIPMENT_NO;
+    IF EXISTS (SELECT 1 FROM "TBL_POF_EC" WHERE "EQUIPMENT_NO" = I_EQUIPMENT_NO AND "PRESENT_YEAR" = cast(I_PRESENT_YEAR AS VARCHAR)) THEN
+     UPDATE "TBL_POF_EC" SET	 	"YEAR_IN_SERVICE"						=	cast(V_YEAR_IN_SERVICE AS VARCHAR)
+    						,"NOM_DIA_D_INCHES"					=	cast(V_NOM_DIA_D_INCHES AS VARCHAR)
+    						,"NOM_THK_NT_INCHES"					=	cast(V_NOM_THK_NT_INCHES AS VARCHAR)
+    						,"DESIGN_TEMP_DEGF"					=	cast(V_DESIGN_TEMP_DEGF AS VARCHAR)
+    						,"DESIGN_PRESSURE_P_PSI"				=	cast(V_DESIGN_PRESSURE_P_PSI AS VARCHAR)
+    						,"EFFECTIVE_CORROSION_RATE"			=	cast(V_EFFECTIVE_CORROSION_RATE AS VARCHAR)
+    						,"MATERIAL_STD"						=	cast(V_MATERIAL_STD AS VARCHAR)
+    						,"MATERIAL_GRADE"						=	cast(V_MATERIAL_GRADE AS VARCHAR)
+    						,"INJECTION_POINTS_INTERMITENT"		=	cast(V_INJECTION_POINTS_INTERMITENT AS VARCHAR)
+    						,"CORROSION_ALLOWANCE"				=	cast(V_CORROSION_ALLOWANCE AS VARCHAR)
+    						,"VERY_HIGH"						=	cast(V_VERY_HIGH AS VARCHAR)
+    						,"HIGH"								=	cast(V_HIGH AS VARCHAR)
+    						,"MEDIUM"							=	cast(V_MEDIUM AS VARCHAR)
+    						,"LOW"								=	cast(V_LOW AS VARCHAR)
+    						,"NO"								=	cast(V_NO AS VARCHAR)
+    						,"LAST_MEASURED_THK_FOR_DIA_LMT"		=	cast(V_LAST_MEASURED_THK_FOR_DIA_LMT AS VARCHAR)
+    						,"LAST_MEASURED_YEAR_FOR_DIA_LMY"		=	cast(V_LAST_MEASURED_YEAR_FOR_DIA_LMY AS VARCHAR)
+    						,"YIELD_STRENGTH_KSI"					=	cast(V_YIELD_STRENGTH_KSI AS VARCHAR)
+    						,"TENSILE_STREGTH_KSI"				=	cast(V_TENSILE_STREGTH_KSI AS VARCHAR)
+    						
+    						,"EFFICIENCY_OF_WELD_E"				=	cast(I_EFFICIENCY_OF_WELD_E AS VARCHAR) 
+    						,"YOUNGS_MODULUS_Y"					=	cast(I_YOUNGS_MODULUS_Y AS VARCHAR)     
+    						,"ALLOWABLE_STRESS_PSI"				=	cast(V_ALLOWABLE_STRESS_PSI AS VARCHAR)
+    						,"PRP_1"								=	cast(V_PRP_1 AS VARCHAR)
+    						,"PRP_2"								=	cast(V_PRP_2 AS VARCHAR)
+    						,"PRP_3"								=	cast(V_PRP_3 AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_1_A"		=	cast(V_CONDITIONAL_PROBABILITY_1_A AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_1_B"		=	cast(V_CONDITIONAL_PROBABILITY_1_B AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_1_C"		=	cast(V_CONDITIONAL_PROBABILITY_1_C AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_1_D"		=	cast(V_CONDITIONAL_PROBABILITY_1_D AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_1_E"		=	cast(V_CONDITIONAL_PROBABILITY_1_E AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_2_A"		=	cast(V_CONDITIONAL_PROBABILITY_2_A AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_2_B"		=	cast(V_CONDITIONAL_PROBABILITY_2_B AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_2_C"		=	cast(V_CONDITIONAL_PROBABILITY_2_C AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_2_D"		=	cast(V_CONDITIONAL_PROBABILITY_2_D AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_2_E"		=	cast(V_CONDITIONAL_PROBABILITY_2_E AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_3_A"		=	cast(V_CONDITIONAL_PROBABILITY_3_A AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_3_B"		=	cast(V_CONDITIONAL_PROBABILITY_3_B AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_3_C"		=	cast(V_CONDITIONAL_PROBABILITY_3_C AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_3_D"		=	cast(V_CONDITIONAL_PROBABILITY_3_D AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_3_E"		=	cast(V_CONDITIONAL_PROBABILITY_3_E AS VARCHAR)
+    						,"EFFECTIVE_THK"						=	cast(V_EFFECTIVE_THK AS VARCHAR)						
+    						,"EFFECTIVE_AGE"						=	cast(V_EFFECTIVE_AGE AS VARCHAR)						
+    						,"MIN_REQ_THK"						=	cast(V_MIN_REQ_THK AS VARCHAR)						
+    						,"EFFECTIVE_CORR_RATE"				=	cast(V_EFFECTIVE_CORR_RATE AS VARCHAR)				
+    						,"ART"								=	cast(V_ART AS VARCHAR)								
+    						,"FLOW_STRESS"						=	cast(V_FLOW_STRESS AS VARCHAR)					
+    						,"STENGTH_RATIO"						=	cast(V_STENGTH_RATIO AS VARCHAR)						
+    						,"INSPECTION_EFFECTIVENESS_1"			=	cast(V_INSPECTION_EFFECTIVENESS_1 AS VARCHAR)			
+    						,"INSPECTION_EFFECTIVENESS_2"			=	cast(V_INSPECTION_EFFECTIVENESS_2 AS VARCHAR)			
+    						,"INSPECTION_EFFECTIVENESS_3"			=	cast(V_INSPECTION_EFFECTIVENESS_3 AS VARCHAR)			
+    						,"POSTERIOR_PROBABILITY_1"			=	cast(V_POSTERIOR_PROBABILITY_1 AS VARCHAR)			
+    						,"POSTERIOR_PROBABILITY_2"			=	cast(V_POSTERIOR_PROBABILITY_2 AS VARCHAR)			
+    						,"POSTERIOR_PROBABILITY_3"			=	cast(V_POSTERIOR_PROBABILITY_3 AS VARCHAR)			
+    						,"CAL_OF_BETA_COVT"					=	cast(V_CAL_OF_BETA_COVT AS VARCHAR)					
+    						,"CAL_OF_BETA_COVSF"					=	cast(V_CAL_OF_BETA_COVSF AS VARCHAR)					
+    						,"CAL_OF_BETA_COVP"					=	cast(V_CAL_OF_BETA_COVP AS VARCHAR)					
+    						,"CAL_OF_BETA_CONST_1"				=	cast(V_CAL_OF_BETA_CONST_1 AS VARCHAR)				
+    						,"CAL_OF_BETA_CONST_2"				=	cast(V_CAL_OF_BETA_CONST_2 AS VARCHAR)				
+    						,"CAL_OF_BETA_CONST_3"				=	cast(V_CAL_OF_BETA_CONST_3 AS VARCHAR)				
+    						,"CAL_OF_BETA_1"						=	cast(V_CAL_OF_BETA_1 AS VARCHAR)						
+    						,"CAL_OF_BETA_2"						=	cast(V_CAL_OF_BETA_2 AS VARCHAR)						
+    						,"CAL_OF_BETA_3"						=	cast(V_CAL_OF_BETA_3 AS VARCHAR)						
+    						,"CAL_OF_BETA_DS_VALUES_1"			=	cast(V_CAL_OF_BETA_DS_VALUES_1 AS VARCHAR)			
+    						,"CAL_OF_BETA_DS_VALUES_2"			=	cast(V_CAL_OF_BETA_DS_VALUES_2 AS VARCHAR)			
+    						,"CAL_OF_BETA_DS_VALUES_3"			=	cast(V_CAL_OF_BETA_DS_VALUES_3 AS VARCHAR)			
+    						,"DAMAGE_FACTOR"						=	cast(ROUND(V_DAMAGE_FACTOR::NUMERIC, 5) AS VARCHAR)						
+    						,"POF"								=	cast(ROUND(V_POF::NUMERIC) AS VARCHAR)								
+    						,"POF_EXPO"							=	cast(ROUND(V_POF_EXPO::NUMERIC, 5) AS VARCHAR)							
+    						,"AVAILABLE_THK"						=	cast(V_AVAILABLE_THK AS VARCHAR)						
+    						,"REMAINING_LIFE"						=	cast(V_REMAINING_LIFE AS VARCHAR)						
+    						,"HALF_LIFE"							=	cast(V_HALF_LIFE AS VARCHAR)						
+    						,"POF_HALF_LIFE"						=	cast(V_POF_HALF_LIFE AS VARCHAR)						
+    						,"OVERALL_POF"						=	cast(V_OVERALL_POF  AS VARCHAR)		
+    						,"USE_LICR"                         =   V_USE_LICR
+    ,"USE_SICR"                                                 =   V_USE_SICR
+    ,"THEORETICAL_CORROSION_RATE_TICR"                              = cast(V_THEORETICAL_CORROSION_RATE_TICR  AS VARCHAR)
+    ,"MEASURED_LONGTERM_CORROSION_RATE_LICR"                    = cast(V_MEASURED_LONGTERM_CORROSION_RATE_LICR   AS VARCHAR)
+    ,"MEASURED_SHORTTERM_CORROSION_RATE_SICR"                    = cast(V_MEASURED_SHORTTERM_CORROSION_RATE_SICR   AS VARCHAR)
+    						,"ModifiedDate"                     = NOW()
+    						,"ModifiedBy"                     = 'SYSADMIN'
+    WHERE "EQUIPMENT_NO" = I_EQUIPMENT_NO AND "PRESENT_YEAR" = cast(I_PRESENT_YEAR AS VARCHAR); 
+    ELSE
+    INSERT INTO "TBL_POF_EC" (	
+    "EQUIPMENT_NO"
+    ,"PRESENT_YEAR"
+    ,"CORROSION_TYPE"
+    ,"YEAR_IN_SERVICE"								
+    ,"NOM_DIA_D_INCHES"								
+    ,"NOM_THK_NT_INCHES"							
+    ,"DESIGN_TEMP_DEGF"								
+    ,"DESIGN_PRESSURE_P_PSI"						
+    ,"EFFECTIVE_CORROSION_RATE"						
+    ,"MATERIAL_STD"									
+    ,"MATERIAL_GRADE"								
+    ,"INJECTION_POINTS_INTERMITENT"					
+    ,"CORROSION_ALLOWANCE"							
+    ,"VERY_HIGH"									
+    ,"HIGH"											
+    ,"MEDIUM"										
+    ,"LOW"											
+    ,"NO"											
+    ,"LAST_MEASURED_THK_FOR_DIA_LMT"				
+    ,"LAST_MEASURED_YEAR_FOR_DIA_LMY"				
+    ,"YIELD_STRENGTH_KSI"							
+    ,"TENSILE_STREGTH_KSI"									
+    ,"EFFICIENCY_OF_WELD_E"							
+    ,"YOUNGS_MODULUS_Y"								
+    ,"ALLOWABLE_STRESS_PSI"							
+    ,"PRP_1"										
+    ,"PRP_2"										
+    ,"PRP_3"										
+    ,"CONDITIONAL_PROBABILITY_1_A"					
+    ,"CONDITIONAL_PROBABILITY_1_B"					
+    ,"CONDITIONAL_PROBABILITY_1_C"					
+    ,"CONDITIONAL_PROBABILITY_1_D"					
+    ,"CONDITIONAL_PROBABILITY_1_E"			        
+    ,"CONDITIONAL_PROBABILITY_2_A"			        
+    ,"CONDITIONAL_PROBABILITY_2_B"			        
+    ,"CONDITIONAL_PROBABILITY_2_C"			        
+    ,"CONDITIONAL_PROBABILITY_2_D"			        
+    ,"CONDITIONAL_PROBABILITY_2_E"			        
+    ,"CONDITIONAL_PROBABILITY_3_A"			        
+    ,"CONDITIONAL_PROBABILITY_3_B"			        
+    ,"CONDITIONAL_PROBABILITY_3_C"			        
+    ,"CONDITIONAL_PROBABILITY_3_D"			        
+    ,"CONDITIONAL_PROBABILITY_3_E"			        
+    ,"EFFECTIVE_THK"						        	
+    ,"EFFECTIVE_AGE"						        	
+    ,"MIN_REQ_THK"							        
+    ,"EFFECTIVE_CORR_RATE"					        
+    ,"ART"									        
+    ,"FLOW_STRESS"							        
+    ,"STENGTH_RATIO"						        	
+    ,"INSPECTION_EFFECTIVENESS_1"			        	
+    ,"INSPECTION_EFFECTIVENESS_2"			        	
+    ,"INSPECTION_EFFECTIVENESS_3"			        	
+    ,"POSTERIOR_PROBABILITY_1"				        
+    ,"POSTERIOR_PROBABILITY_2"				        
+    ,"POSTERIOR_PROBABILITY_3"				        
+    ,"CAL_OF_BETA_COVT"						        
+    ,"CAL_OF_BETA_COVSF"					        	
+    ,"CAL_OF_BETA_COVP"						        
+    ,"CAL_OF_BETA_CONST_1"					        
+    ,"CAL_OF_BETA_CONST_2"					        
+    ,"CAL_OF_BETA_CONST_3"					        
+    ,"CAL_OF_BETA_1"						        	
+    ,"CAL_OF_BETA_2"						        	
+    ,"CAL_OF_BETA_3"						        	
+    ,"CAL_OF_BETA_DS_VALUES_1"				        
+    ,"CAL_OF_BETA_DS_VALUES_2"				        
+    ,"CAL_OF_BETA_DS_VALUES_3"				        
+    ,"DAMAGE_FACTOR"	        
+    ,"POF_EXPO"	
+    ,"POF"							        
+    ,"AVAILABLE_THK"						        	
+    ,"REMAINING_LIFE"						        	
+    ,"HALF_LIFE"							        
+    ,"POF_HALF_LIFE"						        	
+    ,"OVERALL_POF"	
+    ,"USE_LICR" 
+    ,"USE_SICR" 
+    ,"THEORETICAL_CORROSION_RATE_TICR" 
+    ,"MEASURED_LONGTERM_CORROSION_RATE_LICR"
+    ,"MEASURED_SHORTTERM_CORROSION_RATE_SICR" 	
+    ,"CreatedDate"                     	        
+    ,"CreatedBy" 	
+    )
+    VALUES(
+    I_EQUIPMENT_NO
+    ,cast(I_PRESENT_YEAR AS VARCHAR)
+    ,'EC'
+    ,cast(V_YEAR_IN_SERVICE AS VARCHAR)						
+    ,cast(V_NOM_DIA_D_INCHES AS VARCHAR)
+    ,cast(V_NOM_THK_NT_INCHES AS VARCHAR)
+    ,cast(V_DESIGN_TEMP_DEGF AS VARCHAR)
+    ,cast(V_DESIGN_PRESSURE_P_PSI AS VARCHAR)
+    ,cast(V_EFFECTIVE_CORROSION_RATE AS VARCHAR)
+    ,cast(V_MATERIAL_STD AS VARCHAR)
+    ,cast(V_MATERIAL_GRADE AS VARCHAR)
+    ,cast(V_INJECTION_POINTS_INTERMITENT AS VARCHAR)
+    ,cast(V_CORROSION_ALLOWANCE AS VARCHAR)
+    ,cast(V_VERY_HIGH AS VARCHAR)
+    ,cast(V_HIGH AS VARCHAR)
+    ,cast(V_MEDIUM AS VARCHAR)
+    ,cast(V_LOW AS VARCHAR)
+    ,cast(V_NO AS VARCHAR)
+    ,cast(V_LAST_MEASURED_THK_FOR_DIA_LMT AS VARCHAR)
+    ,cast(V_LAST_MEASURED_YEAR_FOR_DIA_LMY AS VARCHAR)
+    ,cast(V_YIELD_STRENGTH_KSI AS VARCHAR)
+    ,cast(V_TENSILE_STREGTH_KSI AS VARCHAR)				
+    ,cast(I_EFFICIENCY_OF_WELD_E AS VARCHAR) 
+    ,cast(I_YOUNGS_MODULUS_Y AS VARCHAR)     
+    ,cast(V_ALLOWABLE_STRESS_PSI AS VARCHAR)
+    ,cast(V_PRP_1 AS VARCHAR)
+    ,cast(V_PRP_2 AS VARCHAR)
+    ,cast(V_PRP_3 AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_1_A AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_1_B AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_1_C AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_1_D AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_1_E AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_2_A AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_2_B AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_2_C AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_2_D AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_2_E AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_3_A AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_3_B AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_3_C AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_3_D AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_3_E AS VARCHAR)
+    ,cast(V_EFFECTIVE_THK AS VARCHAR)					
+    ,cast(V_EFFECTIVE_AGE AS VARCHAR)					
+    ,cast(V_MIN_REQ_THK AS VARCHAR)						
+    ,cast(V_EFFECTIVE_CORR_RATE AS VARCHAR)				
+    ,cast(V_ART AS VARCHAR)								
+    ,cast(V_FLOW_STRESS AS VARCHAR)					
+    ,cast(V_STENGTH_RATIO AS VARCHAR)					
+    ,cast(V_INSPECTION_EFFECTIVENESS_1 AS VARCHAR)		
+    ,cast(V_INSPECTION_EFFECTIVENESS_2 AS VARCHAR)		
+    ,cast(V_INSPECTION_EFFECTIVENESS_3 AS VARCHAR)		
+    ,cast(V_POSTERIOR_PROBABILITY_1 AS VARCHAR)			
+    ,cast(V_POSTERIOR_PROBABILITY_2 AS VARCHAR)			
+    ,cast(V_POSTERIOR_PROBABILITY_3 AS VARCHAR)			
+    ,cast(V_CAL_OF_BETA_COVT AS VARCHAR)					
+    ,cast(V_CAL_OF_BETA_COVSF AS VARCHAR)				
+    ,cast(V_CAL_OF_BETA_COVP AS VARCHAR)					
+    ,cast(V_CAL_OF_BETA_CONST_1 AS VARCHAR)				
+    ,cast(V_CAL_OF_BETA_CONST_2 AS VARCHAR)				
+    ,cast(V_CAL_OF_BETA_CONST_3 AS VARCHAR)				
+    ,cast(V_CAL_OF_BETA_1 AS VARCHAR)					
+    ,cast(V_CAL_OF_BETA_2 AS VARCHAR)					
+    ,cast(V_CAL_OF_BETA_3 AS VARCHAR)					
+    ,cast(V_CAL_OF_BETA_DS_VALUES_1 AS VARCHAR)			
+    ,cast(V_CAL_OF_BETA_DS_VALUES_2 AS VARCHAR)			
+    ,cast(V_CAL_OF_BETA_DS_VALUES_3 AS VARCHAR)			
+    ,cast(V_DAMAGE_FACTOR AS VARCHAR)					
+    ,cast(ROUND(V_POF_EXPO::NUMERIC, 5) AS VARCHAR)								
+    ,cast(ROUND(V_POF::NUMERIC) AS VARCHAR)								
+    ,cast(V_AVAILABLE_THK AS VARCHAR)					
+    ,cast(V_REMAINING_LIFE AS VARCHAR)					
+    ,cast(V_HALF_LIFE AS VARCHAR)						
+    ,cast(V_POF_HALF_LIFE AS VARCHAR)					
+    ,cast(V_OVERALL_POF  AS VARCHAR)
+    ,V_USE_LICR 
+    ,V_USE_SICR 
+    ,cast(ROUND(V_THEORETICAL_CORROSION_RATE_TICR::NUMERIC, 5)   AS VARCHAR)  
+    ,cast(ROUND(V_MEASURED_LONGTERM_CORROSION_RATE_LICR::NUMERIC, 5)   AS VARCHAR)
+    ,cast(ROUND(V_MEASURED_SHORTTERM_CORROSION_RATE_SICR::NUMERIC, 5)   AS VARCHAR)
+    ,NOW()
+    ,'SYSADMIN'
+    );
+
+    END IF;
+    END;
+    $BODY$ ;
+
+    --CALL sp_upd_pof_ec ('P01.AL1001',2020);
+
+    CREATE OR REPLACE PROCEDURE USP_COF_CALCULATION()
+    LANGUAGE 'plpgsql'
+
+    AS $BODY$ 
+
+    DECLARE 
+    cdLiquid NUMERIC;
+    cdVapour NUMERIC;
+    kv NUMERIC;
+    gc NUMERIC;
+    c1 NUMERIC;
+    patm NUMERIC;
+    holeDia NUMERIC;
+    maxDiaWmax NUMERIC;
+    D1 NUMERIC;
+    D2 NUMERIC;
+    D3 NUMERIC;
+    D4 NUMERIC;
+    cofid NUMERIC;
+    BEGIN
+    cdLiquid := 0.61;
+    cdVapour := 0.9;
+    kv := 1;
+    gc := 1;
+    c1 := 31623;
+    patm := 101.325;
+    holeDia := 6.4;
+    maxDiaWmax := 6.4;
+    D1 := 6.4;
+    D2 := 25;
+    D3 := 102;
+    D4 := 406;
+
+    SELECT MAX("PipeMasterCOFID") INTO cofid FROM "PipeMasterCOF";
+
+    INSERT INTO public."COFFlammable"(
+    	"COFFlammableID", "CreatedBy", "CreatedDate", "EquipmentNo", "FluidCode", "Holes", "ReferenceFluid", "ToxicFluid", "ToxicPercentage", "ReleaseState", "StoredStage", "ReleaseModel", "OpPr", "Detection", "Isolation", "Mitigation", "Diameter", "Length", "OpTemp", "IgnitionSourceNearBy", "MassInventory", 
+    	"CdLiquid", "CdVapour", "Kv", "Gc", "C1", "Patm", "HoleDia", "MaxDiaWmax", 
+    	"MW", "FluidType", "AIT", "EffectiveDensity", "VapourDensity", "LiquidDensity", "K", 
+    	"Max60XLD", 
+    	"Area", "OpPrPlus101", "LiquidReleaseRate", "Ptrans", "Wn1", "Wn2", "PPtrans", "VapourReleaseRate", "EffectiveReleaseRate", "MaxAreaWmax", "LiquidReleaseRateLDmax", "Wn1Wmax", "Wn2Wmax", "VapourReleaseRateWmax", "EffectiveReleaseRateWmax", "MassComp", "AvailableMassInventory", "MassAdd", "MassCompPlusMassAdd", "MassAvailable", "Tn", "ReleaseType", 
+    	"FactDI", 
+    	"FactMIT", 
+    	"Raten", "LDn", "Massn", 
+    	"CAINL_A_cmd", "CAINL_B_cmd", "IAINL_A_cmd", "IAINL_B_cmd", "CAIL_A_cmd", "CAIL_B_cmd", "IAIL_A_cmd", "IAIL_B_cmd", "CAINL_A_pi", "CAINL_B_pi", "IAINL_A_pi", "IAINL_B_pi", "CAIL_A_pi", "CAIL_B_pi", "IAIL_A_pi", "IAIL_B_pi", 
+    	"Ts", "Enff", 
+    	"CAINL_CA_cmd", "IAINL_CA_cmd", "CAIL_CA_cmd", "IAIL_CA_cmd", "CAINL_CA_pi", "IAINL_CA_pi", "CAIL_CA_pi", "IAIL_CA_pi", "FactICcalc", "FactIC", "AINL_CA_cmd", "AIL_CA_cmd", "AINL_CA_pi", "AIL_CA_pi", "TsPlus55", "TsMinus55", "FactAITcalc", "FactAIT", "CA_cmd", "CA_pi", 
+    	"GFFn", "GFFtotal", 
+    	"Final_CA_cmd", "Final_CA_pi")	
+    	SELECT  
+    	p."PipeMasterCOFID", 'SYSADMIN', Now(), p."EquipmentNo", p."FluidCode", 'D1', p."ApplicableFluid", p."ToxicFluid", p."ToxicFluidPercentage",p."ReleaseState", p."StoredStage", p."ReleaseModel", p."OperatingPressure", p."DetectionRating", p."IsolationRating", p."Mitigation",  p."ComponentDiameter", p."ComponentLength", p."OperatingTemperature", p."IgnitionSource", p."MassInventory",
+    	cdLiquid, cdVapour, kv, gc, c1, patm, D1, D1, 
+    	f."MolecularWeight",f."FluidType",f."AIT",(CASE WHEN p."StoredStage"='Liquid' THEN f."LiquidDensity" ELSE (f."MolecularWeight"*p."OperatingPressure")/(8.314*(p."OperatingTemperature"+273.4)) END ),(f."MolecularWeight"*p."OperatingPressure")/(8.314*(p."OperatingTemperature"+273.4)),f."LiquidDensity",f."K",
+    	(SELECT MAX(l."D1") * 60 FROM "MST_LDMax" l WHERE l."DetectionRating" = p."DetectionRating" AND l."IsolationRating" = p."IsolationRating"),
+        (3.142*p."ComponentDiameter"*p."ComponentDiameter")/4,
+    	(p."OperatingPressure"+101.325),
+    	0,0,0,0,0,0,0,0,0,0,
+    	0,0,0,0,0,0,0,0,0,0,
+    	(SELECT MAX(d."FactDI") FROM "MST_DetectionIsolation" d WHERE d."DetectionRating" = p."DetectionRating" AND d."IsolationRating" = p."IsolationRating"),
+    	(SELECT MAX(m."FactMIT") FROM "MST_MitigationSystem" m WHERE m."Mitigation" = p."Mitigation"),
+    	0,0,0,
+    	c."CAINL_A_cmd", c."CAINL_B_cmd", c."IAINL_A_cmd", c."IAINL_B_cmd", c."CAIL_A_cmd", c."CAIL_B_cmd", c."IAIL_A_cmd", c."IAIL_B_cmd", c."CAINL_A_pi", c."CAINL_B_pi", c."IAINL_A_pi", c."IAINL_B_pi", c."CAIL_A_pi", c."CAIL_B_pi", c."IAIL_A_pi", c."IAIL_B_pi",
+    	0,0,
+    	0,0,0,0,0,0,0,0,0,0,
+    	0,0,0,0,0,0,0,0,0,0,
+    	(SELECT MAX(g."Gff1") FROM "MST_GFF" g WHERE g."ComponentDiameterFrom" <= p."ComponentDiameter" AND g."ComponentDiameterTo" >= p."ComponentDiameter"),
+    	(SELECT MAX(g."GffTotal") FROM "MST_GFF" g WHERE g."ComponentDiameterFrom" <= p."ComponentDiameter" AND g."ComponentDiameterTo" >= p."ComponentDiameter"),
+    	0,0
+    	FROM "PipeMasterCOF" p
+    	LEFT OUTER JOIN "MST_FluidProperty" f ON f."RepresentativeFluid" = p."ApplicableFluid" 
+    	LEFT OUTER JOIN "MST_FlammableConstant" c ON c."Fluid" = p."ApplicableFluid" AND c."FluidModel" = p."ReleaseModel";	
+    	
+    INSERT INTO public."COFFlammable"(
+    	"COFFlammableID", "CreatedBy", "CreatedDate", "EquipmentNo", "FluidCode", "Holes", "ReferenceFluid", "ToxicFluid", "ToxicPercentage", "ReleaseState", "StoredStage", "ReleaseModel", "OpPr", "Detection", "Isolation", "Mitigation", "Diameter", "Length", "OpTemp", "IgnitionSourceNearBy", "MassInventory", 
+    	"CdLiquid", "CdVapour", "Kv", "Gc", "C1", "Patm", "HoleDia", "MaxDiaWmax", 
+    	"MW", "FluidType", "AIT", "EffectiveDensity", "VapourDensity", "LiquidDensity", "K", 
+    	"Max60XLD", 
+    	"Area", "OpPrPlus101", "LiquidReleaseRate", "Ptrans", "Wn1", "Wn2", "PPtrans", "VapourReleaseRate", "EffectiveReleaseRate", "MaxAreaWmax", "LiquidReleaseRateLDmax", "Wn1Wmax", "Wn2Wmax", "VapourReleaseRateWmax", "EffectiveReleaseRateWmax", "MassComp", "AvailableMassInventory", "MassAdd", "MassCompPlusMassAdd", "MassAvailable", "Tn", "ReleaseType", 
+    	"FactDI", 
+    	"FactMIT", 
+    	"Raten", "LDn", "Massn", 
+    	"CAINL_A_cmd", "CAINL_B_cmd", "IAINL_A_cmd", "IAINL_B_cmd", "CAIL_A_cmd", "CAIL_B_cmd", "IAIL_A_cmd", "IAIL_B_cmd", "CAINL_A_pi", "CAINL_B_pi", "IAINL_A_pi", "IAINL_B_pi", "CAIL_A_pi", "CAIL_B_pi", "IAIL_A_pi", "IAIL_B_pi", 
+    	"Ts", "Enff", 
+    	"CAINL_CA_cmd", "IAINL_CA_cmd", "CAIL_CA_cmd", "IAIL_CA_cmd", "CAINL_CA_pi", "IAINL_CA_pi", "CAIL_CA_pi", "IAIL_CA_pi", "FactICcalc", "FactIC", "AINL_CA_cmd", "AIL_CA_cmd", "AINL_CA_pi", "AIL_CA_pi", "TsPlus55", "TsMinus55", "FactAITcalc", "FactAIT", "CA_cmd", "CA_pi", 
+    	"GFFn", "GFFtotal", 
+    	"Final_CA_cmd", "Final_CA_pi")	
+    	SELECT  
+    	(cofid * 1) + p."PipeMasterCOFID", 'SYSADMIN', Now(), p."EquipmentNo", p."FluidCode", 'D2', p."ApplicableFluid", p."ToxicFluid", p."ToxicFluidPercentage",p."ReleaseState", p."StoredStage", p."ReleaseModel", p."OperatingPressure", p."DetectionRating", p."IsolationRating", p."Mitigation",  p."ComponentDiameter", p."ComponentLength", p."OperatingTemperature", p."IgnitionSource", p."MassInventory",
+    	cdLiquid, cdVapour, kv, gc, c1, patm, D2, D2, 
+    	f."MolecularWeight",f."FluidType",f."AIT",(CASE WHEN p."StoredStage"='Liquid' THEN f."LiquidDensity" ELSE (f."MolecularWeight"*p."OperatingPressure")/(8.314*(p."OperatingTemperature"+273.4)) END ),(f."MolecularWeight"*p."OperatingPressure")/(8.314*(p."OperatingTemperature"+273.4)),f."LiquidDensity",f."K",
+    	(SELECT MAX(l."D2") * 60 FROM "MST_LDMax" l WHERE l."DetectionRating" = p."DetectionRating" AND l."IsolationRating" = p."IsolationRating"),
+        (3.142*p."ComponentDiameter"*p."ComponentDiameter")/4,
+    	(p."OperatingPressure"+101.325),
+    	0,0,0,0,0,0,0,0,0,0,
+    	0,0,0,0,0,0,0,0,0,0,
+    	(SELECT MAX(d."FactDI") FROM "MST_DetectionIsolation" d WHERE d."DetectionRating" = p."DetectionRating" AND d."IsolationRating" = p."IsolationRating"),
+    	(SELECT MAX(m."FactMIT") FROM "MST_MitigationSystem" m WHERE m."Mitigation" = p."Mitigation"),
+    	0,0,0,
+    	c."CAINL_A_cmd", c."CAINL_B_cmd", c."IAINL_A_cmd", c."IAINL_B_cmd", c."CAIL_A_cmd", c."CAIL_B_cmd", c."IAIL_A_cmd", c."IAIL_B_cmd", c."CAINL_A_pi", c."CAINL_B_pi", c."IAINL_A_pi", c."IAINL_B_pi", c."CAIL_A_pi", c."CAIL_B_pi", c."IAIL_A_pi", c."IAIL_B_pi",
+    	0,0,
+    	0,0,0,0,0,0,0,0,0,0,
+    	0,0,0,0,0,0,0,0,0,0,
+    	(SELECT MAX(g."Gff1") FROM "MST_GFF" g WHERE g."ComponentDiameterFrom" <= p."ComponentDiameter" AND g."ComponentDiameterTo" >= p."ComponentDiameter"),
+    	(SELECT MAX(g."GffTotal") FROM "MST_GFF" g WHERE g."ComponentDiameterFrom" <= p."ComponentDiameter" AND g."ComponentDiameterTo" >= p."ComponentDiameter"),
+    	0,0
+    	FROM "PipeMasterCOF" p
+    	LEFT OUTER JOIN "MST_FluidProperty" f ON f."RepresentativeFluid" = p."ApplicableFluid" 
+    	LEFT OUTER JOIN "MST_FlammableConstant" c ON c."Fluid" = p."ApplicableFluid" AND c."FluidModel" = p."ReleaseModel";	
+
+    INSERT INTO public."COFFlammable"(
+    	"COFFlammableID", "CreatedBy", "CreatedDate", "EquipmentNo", "FluidCode", "Holes", "ReferenceFluid", "ToxicFluid", "ToxicPercentage", "ReleaseState", "StoredStage", "ReleaseModel", "OpPr", "Detection", "Isolation", "Mitigation", "Diameter", "Length", "OpTemp", "IgnitionSourceNearBy", "MassInventory", 
+    	"CdLiquid", "CdVapour", "Kv", "Gc", "C1", "Patm", "HoleDia", "MaxDiaWmax", 
+    	"MW", "FluidType", "AIT", "EffectiveDensity", "VapourDensity", "LiquidDensity", "K", 
+    	"Max60XLD", 
+    	"Area", "OpPrPlus101", "LiquidReleaseRate", "Ptrans", "Wn1", "Wn2", "PPtrans", "VapourReleaseRate", "EffectiveReleaseRate", "MaxAreaWmax", "LiquidReleaseRateLDmax", "Wn1Wmax", "Wn2Wmax", "VapourReleaseRateWmax", "EffectiveReleaseRateWmax", "MassComp", "AvailableMassInventory", "MassAdd", "MassCompPlusMassAdd", "MassAvailable", "Tn", "ReleaseType", 
+    	"FactDI", 
+    	"FactMIT", 
+    	"Raten", "LDn", "Massn", 
+    	"CAINL_A_cmd", "CAINL_B_cmd", "IAINL_A_cmd", "IAINL_B_cmd", "CAIL_A_cmd", "CAIL_B_cmd", "IAIL_A_cmd", "IAIL_B_cmd", "CAINL_A_pi", "CAINL_B_pi", "IAINL_A_pi", "IAINL_B_pi", "CAIL_A_pi", "CAIL_B_pi", "IAIL_A_pi", "IAIL_B_pi", 
+    	"Ts", "Enff", 
+    	"CAINL_CA_cmd", "IAINL_CA_cmd", "CAIL_CA_cmd", "IAIL_CA_cmd", "CAINL_CA_pi", "IAINL_CA_pi", "CAIL_CA_pi", "IAIL_CA_pi", "FactICcalc", "FactIC", "AINL_CA_cmd", "AIL_CA_cmd", "AINL_CA_pi", "AIL_CA_pi", "TsPlus55", "TsMinus55", "FactAITcalc", "FactAIT", "CA_cmd", "CA_pi", 
+    	"GFFn", "GFFtotal", 
+    	"Final_CA_cmd", "Final_CA_pi")	
+    	SELECT  
+    	(cofid * 2) + p."PipeMasterCOFID", 'SYSADMIN', Now(), p."EquipmentNo", p."FluidCode", 'D3', p."ApplicableFluid", p."ToxicFluid", p."ToxicFluidPercentage",p."ReleaseState", p."StoredStage", p."ReleaseModel", p."OperatingPressure", p."DetectionRating", p."IsolationRating", p."Mitigation",  p."ComponentDiameter", p."ComponentLength", p."OperatingTemperature", p."IgnitionSource", p."MassInventory",
+    	cdLiquid, cdVapour, kv, gc, c1, patm, D3, D3, 
+    	f."MolecularWeight",f."FluidType",f."AIT",(CASE WHEN p."StoredStage"='Liquid' THEN f."LiquidDensity" ELSE (f."MolecularWeight"*p."OperatingPressure")/(8.314*(p."OperatingTemperature"+273.4)) END ),(f."MolecularWeight"*p."OperatingPressure")/(8.314*(p."OperatingTemperature"+273.4)),f."LiquidDensity",f."K",
+    	(SELECT MAX(l."D3") * 60 FROM "MST_LDMax" l WHERE l."DetectionRating" = p."DetectionRating" AND l."IsolationRating" = p."IsolationRating"),
+        (3.142*p."ComponentDiameter"*p."ComponentDiameter")/4,
+    	(p."OperatingPressure"+101.325),
+    	0,0,0,0,0,0,0,0,0,0,
+    	0,0,0,0,0,0,0,0,0,0,
+    	(SELECT MAX(d."FactDI") FROM "MST_DetectionIsolation" d WHERE d."DetectionRating" = p."DetectionRating" AND d."IsolationRating" = p."IsolationRating"),
+    	(SELECT MAX(m."FactMIT") FROM "MST_MitigationSystem" m WHERE m."Mitigation" = p."Mitigation"),
+    	0,0,0,
+    	c."CAINL_A_cmd", c."CAINL_B_cmd", c."IAINL_A_cmd", c."IAINL_B_cmd", c."CAIL_A_cmd", c."CAIL_B_cmd", c."IAIL_A_cmd", c."IAIL_B_cmd", c."CAINL_A_pi", c."CAINL_B_pi", c."IAINL_A_pi", c."IAINL_B_pi", c."CAIL_A_pi", c."CAIL_B_pi", c."IAIL_A_pi", c."IAIL_B_pi",
+    	0,0,
+    	0,0,0,0,0,0,0,0,0,0,
+    	0,0,0,0,0,0,0,0,0,0,
+    	(SELECT MAX(g."Gff1") FROM "MST_GFF" g WHERE g."ComponentDiameterFrom" <= p."ComponentDiameter" AND g."ComponentDiameterTo" >= p."ComponentDiameter"),
+    	(SELECT MAX(g."GffTotal") FROM "MST_GFF" g WHERE g."ComponentDiameterFrom" <= p."ComponentDiameter" AND g."ComponentDiameterTo" >= p."ComponentDiameter"),
+    	0,0
+    	FROM "PipeMasterCOF" p
+    	LEFT OUTER JOIN "MST_FluidProperty" f ON f."RepresentativeFluid" = p."ApplicableFluid" 
+    	LEFT OUTER JOIN "MST_FlammableConstant" c ON c."Fluid" = p."ApplicableFluid" AND c."FluidModel" = p."ReleaseModel";
+
+    INSERT INTO public."COFFlammable"(
+    	"COFFlammableID", "CreatedBy", "CreatedDate", "EquipmentNo", "FluidCode", "Holes", "ReferenceFluid", "ToxicFluid", "ToxicPercentage", "ReleaseState", "StoredStage", "ReleaseModel", "OpPr", "Detection", "Isolation", "Mitigation", "Diameter", "Length", "OpTemp", "IgnitionSourceNearBy", "MassInventory", 
+    	"CdLiquid", "CdVapour", "Kv", "Gc", "C1", "Patm", "HoleDia", "MaxDiaWmax", 
+    	"MW", "FluidType", "AIT", "EffectiveDensity", "VapourDensity", "LiquidDensity", "K", 
+    	"Max60XLD", 
+    	"Area", "OpPrPlus101", "LiquidReleaseRate", "Ptrans", "Wn1", "Wn2", "PPtrans", "VapourReleaseRate", "EffectiveReleaseRate", "MaxAreaWmax", "LiquidReleaseRateLDmax", "Wn1Wmax", "Wn2Wmax", "VapourReleaseRateWmax", "EffectiveReleaseRateWmax", "MassComp", "AvailableMassInventory", "MassAdd", "MassCompPlusMassAdd", "MassAvailable", "Tn", "ReleaseType", 
+    	"FactDI", 
+    	"FactMIT", 
+    	"Raten", "LDn", "Massn", 
+    	"CAINL_A_cmd", "CAINL_B_cmd", "IAINL_A_cmd", "IAINL_B_cmd", "CAIL_A_cmd", "CAIL_B_cmd", "IAIL_A_cmd", "IAIL_B_cmd", "CAINL_A_pi", "CAINL_B_pi", "IAINL_A_pi", "IAINL_B_pi", "CAIL_A_pi", "CAIL_B_pi", "IAIL_A_pi", "IAIL_B_pi", 
+    	"Ts", "Enff", 
+    	"CAINL_CA_cmd", "IAINL_CA_cmd", "CAIL_CA_cmd", "IAIL_CA_cmd", "CAINL_CA_pi", "IAINL_CA_pi", "CAIL_CA_pi", "IAIL_CA_pi", "FactICcalc", "FactIC", "AINL_CA_cmd", "AIL_CA_cmd", "AINL_CA_pi", "AIL_CA_pi", "TsPlus55", "TsMinus55", "FactAITcalc", "FactAIT", "CA_cmd", "CA_pi", 
+    	"GFFn", "GFFtotal", 
+    	"Final_CA_cmd", "Final_CA_pi")	
+    	SELECT  
+    	(cofid * 3) + p."PipeMasterCOFID", 'SYSADMIN', Now(), p."EquipmentNo", p."FluidCode", 'D4', p."ApplicableFluid", p."ToxicFluid", p."ToxicFluidPercentage",p."ReleaseState", p."StoredStage", p."ReleaseModel", p."OperatingPressure", p."DetectionRating", p."IsolationRating", p."Mitigation",  p."ComponentDiameter", p."ComponentLength", p."OperatingTemperature", p."IgnitionSource", p."MassInventory",
+    	cdLiquid, cdVapour, kv, gc, c1, patm, D4, D4, 
+    	f."MolecularWeight",f."FluidType",f."AIT",(CASE WHEN p."StoredStage"='Liquid' THEN f."LiquidDensity" ELSE (f."MolecularWeight"*p."OperatingPressure")/(8.314*(p."OperatingTemperature"+273.4)) END ),(f."MolecularWeight"*p."OperatingPressure")/(8.314*(p."OperatingTemperature"+273.4)),f."LiquidDensity",f."K",
+    	(SELECT MAX(l."D3") * 60 FROM "MST_LDMax" l WHERE l."DetectionRating" = p."DetectionRating" AND l."IsolationRating" = p."IsolationRating"),
+        (3.142*p."ComponentDiameter"*p."ComponentDiameter")/4,
+    	(p."OperatingPressure"+101.325),
+    	0,0,0,0,0,0,0,0,0,0,
+    	0,0,0,0,0,0,0,0,0,0,
+    	(SELECT MAX(d."FactDI") FROM "MST_DetectionIsolation" d WHERE d."DetectionRating" = p."DetectionRating" AND d."IsolationRating" = p."IsolationRating"),
+    	(SELECT MAX(m."FactMIT") FROM "MST_MitigationSystem" m WHERE m."Mitigation" = p."Mitigation"),
+    	0,0,0,
+    	c."CAINL_A_cmd", c."CAINL_B_cmd", c."IAINL_A_cmd", c."IAINL_B_cmd", c."CAIL_A_cmd", c."CAIL_B_cmd", c."IAIL_A_cmd", c."IAIL_B_cmd", c."CAINL_A_pi", c."CAINL_B_pi", c."IAINL_A_pi", c."IAINL_B_pi", c."CAIL_A_pi", c."CAIL_B_pi", c."IAIL_A_pi", c."IAIL_B_pi",
+    	0,0,
+    	0,0,0,0,0,0,0,0,0,0,
+    	0,0,0,0,0,0,0,0,0,0,
+    	(SELECT MAX(g."Gff1") FROM "MST_GFF" g WHERE g."ComponentDiameterFrom" <= p."ComponentDiameter" AND g."ComponentDiameterTo" >= p."ComponentDiameter"),
+    	(SELECT MAX(g."GffTotal") FROM "MST_GFF" g WHERE g."ComponentDiameterFrom" <= p."ComponentDiameter" AND g."ComponentDiameterTo" >= p."ComponentDiameter"),
+    	0,0
+    	FROM "PipeMasterCOF" p
+    	LEFT OUTER JOIN "MST_FluidProperty" f ON f."RepresentativeFluid" = p."ApplicableFluid" 
+    	LEFT OUTER JOIN "MST_FlammableConstant" c ON c."Fluid" = p."ApplicableFluid" AND c."FluidModel" = p."ReleaseModel";
+    	 
+    	UPDATE "COFFlammable" SET "LiquidReleaseRate" = (CASE WHEN "ReleaseState"='Liquid' THEN (cdLiquid*kv*(SQRT(ABS("EffectiveDensity")))*"Area"*(SQRT(ABS(2*gc*("OpPrPlus101"-patm)))))/c1 ELSE 0 END);	
+        UPDATE "COFFlammable" SET "Ptrans" = (CASE WHEN "ReleaseState"='Gas' THEN patm * POWER(("K"+1)/2,("K"/("K"-1))) ELSE 0 END);
+    	UPDATE "COFFlammable" SET "Wn1" = (CASE WHEN "ReleaseState"='Gas' THEN (cdVapour/1000)*"Area"*"OpPr"*SQRT(ABS((("K"*"MW"*gc)/(8.314*("OpTemp"+273)))*(POWER((2/("K"+1)),(("K"+1)/("K"-1)))))) ELSE 0 END);
+    	UPDATE "COFFlammable" SET "Wn2" = (CASE WHEN "ReleaseState"='Gas' THEN (cdVapour/1000)*"Area"*"OpPr"*SQRT(ABS((("MW"*gc)/(8.314*("OpTemp"+273)))*(POWER((patm/"OpPr"),(2/"K")))*((1-POWER((patm/"OpPr"),(("K"-1)/"K"))))*(((2*"K")/("K"-1))))) ELSE 0 END);
+    	UPDATE "COFFlammable" SET "PPtrans" = (CASE WHEN "OpPr" > "Ptrans" THEN 'Y' ELSE 'N' END);
+        UPDATE "COFFlammable" SET "VapourReleaseRate" = (CASE WHEN "PPtrans"='Y' THEN "Wn1" ELSE "Wn2" END);
+        UPDATE "COFFlammable" SET "EffectiveReleaseRate" =(CASE WHEN "ReleaseState"='Liquid' THEN "LiquidReleaseRate" ELSE "VapourReleaseRate" END);
+
+     UPDATE "COFFlammable" SET "MaxAreaWmax" = (3.142 * "MaxDiaWmax" * "MaxDiaWmax")/4 ;
+     UPDATE "COFFlammable" SET "LiquidReleaseRateLDmax" =(CASE WHEN "StoredStage"='Liquid' THEN (cdLiquid*kv*(SQRT(ABS("EffectiveDensity")))*"MaxAreaWmax"*(SQRT(ABS(2*gc*("OpPrPlus101"-patm)))))/c1 ELSE 0 END); 
+     UPDATE "COFFlammable" SET "Wn1Wmax" =(CASE WHEN "StoredStage"='Gas' THEN (cdVapour/1000)*"MaxAreaWmax"*"OpPr"*SQRT(ABS((("K"*"MW"*gc)/(8.314*("OpTemp"+273))))*(POWER((2/("K"+1)),(("K"+1)/("K"-1))))) ELSE 0 END);
+     UPDATE "COFFlammable" SET "Wn2Wmax" =(CASE WHEN "StoredStage"='Gas' THEN ((cdVapour/1000)*"MaxAreaWmax"*"OpPr")*SQRT(ABS((("MW"*gc)/(8.314*("OpTemp"+273))))*(POWER((patm/"OpPr"),(2/"K")))*((1-POWER((patm/"OpPr"),(("K"-1)/"K"))))*(((2*"K")/("K"-1)))) ELSE 0 END);
+     UPDATE "COFFlammable" SET "VapourReleaseRateWmax" = (CASE WHEN "PPtrans"='Y' THEN "Wn1Wmax" ELSE "Wn2Wmax" END);
+     UPDATE "COFFlammable" SET "EffectiveReleaseRateWmax" =(CASE WHEN "StoredStage"='Liquid' THEN "LiquidReleaseRateLDmax" ELSE "VapourReleaseRateWmax" END);
+     UPDATE "COFFlammable" SET "MassComp" = (((3.142*"Diameter"*"Diameter")/4)*"Length")*"EffectiveDensity"/(1000*1000*1000);
+     UPDATE "COFFlammable" SET "AvailableMassInventory" = "MassInventory" + "MassComp";
+     UPDATE "COFFlammable" SET "MassAdd" = 180 * LEAST("EffectiveReleaseRate","EffectiveReleaseRateWmax");
+     UPDATE "COFFlammable" SET "MassCompPlusMassAdd" ="MassComp" + "MassAdd";
+     UPDATE "COFFlammable" SET "MassAvailable" =LEAST("MassInventory","MassCompPlusMassAdd");
+     UPDATE "COFFlammable" SET "Tn" = 4536/"EffectiveReleaseRate";
+     UPDATE "COFFlammable" SET "ReleaseType" =(CASE WHEN ("Tn" < 180 AND "MassAvailable" > 4536) THEN 'Inst' ELSE 'Cont' END); 
+    	 
+    	 UPDATE "COFFlammable" SET "Raten" = "EffectiveReleaseRate"*(1-"FactDI");
+         UPDATE "COFFlammable" SET "LDn" = LEAST(("MassAvailable"/"Raten"),"Max60XLD");
+    	 UPDATE "COFFlammable" SET "Massn" = LEAST(("Raten"*"LDn"),"MassAvailable");
+    	 
+    	 UPDATE "COFFlammable" SET "Ts" = (CASE WHEN "IgnitionSourceNearBy"='Y' THEN GREATEST("OpTemp","AIT") ELSE "OpTemp" END);
+    	 UPDATE "COFFlammable" SET "Enff" = (CASE WHEN "Massn" < 4536 THEN 1 ELSE (4*LOG(2.205 * "Massn")-15) END);
+    	 
+    UPDATE "COFFlammable" SET "CAINL_CA_cmd" = (("CAINL_A_cmd"*POWER("Raten","CAINL_B_cmd"))*(1-"FactMIT"));
+    UPDATE "COFFlammable" SET "IAINL_CA_cmd" = (("IAINL_A_cmd"*POWER("Massn","IAINL_B_cmd"))*(1-"FactMIT"))/"Enff";
+    UPDATE "COFFlammable" SET "CAIL_CA_cmd" = (("CAIL_A_cmd"*POWER("Raten","CAIL_B_cmd"))*(1-"FactMIT"));
+    UPDATE "COFFlammable" SET "IAIL_CA_cmd" = (("IAIL_A_cmd"*POWER("Massn","IAIL_B_cmd"))*(1-"FactMIT"))/"Enff";
+    UPDATE "COFFlammable" SET "CAINL_CA_pi" = (("CAINL_A_pi"*POWER("Raten","CAINL_B_pi"))*(1-"FactMIT"));
+    UPDATE "COFFlammable" SET "IAINL_CA_pi" = (("IAINL_A_pi"*POWER("Massn","IAINL_B_pi"))*(1-"FactMIT"))/"Enff";
+    UPDATE "COFFlammable" SET "CAIL_CA_pi" = (("CAIL_A_pi"*POWER("Raten","CAIL_B_pi"))*(1-"FactMIT"));
+    UPDATE "COFFlammable" SET "IAIL_CA_pi" = (("IAIL_A_pi"*POWER("Massn","IAIL_B_pi"))*(1-"FactMIT"))/"Enff";
+    UPDATE "COFFlammable" SET "FactICcalc" = (CASE WHEN "FluidType"='TYPE 0' THEN "Raten"/25.2 ELSE 0 END);
+    UPDATE "COFFlammable" SET "FactIC" = (CASE WHEN "ReleaseType"='Cont' THEN LEAST("FactICcalc",1) ELSE 1 END);
+    UPDATE "COFFlammable" SET "AINL_CA_cmd" = ("IAINL_CA_cmd"*"FactIC")+("CAINL_CA_cmd"*(1-"FactIC"));
+    UPDATE "COFFlammable" SET "AIL_CA_cmd" = (CASE WHEN ("ReferenceFluid"='DEE' AND "ReleaseModel"='Gas') THEN "CAIL_CA_cmd" ELSE ("IAIL_CA_cmd"*"FactIC")+("CAIL_CA_cmd"*(1-"FactIC")) END);
+    UPDATE "COFFlammable" SET "AINL_CA_pi" = ("IAINL_CA_pi"*"FactIC")+("CAINL_CA_pi"*(1-"FactIC"));
+    UPDATE "COFFlammable" SET "AIL_CA_pi" = ("IAIL_CA_pi"*"FactIC")+("CAIL_CA_pi"*(1-"FactIC"));
+    UPDATE "COFFlammable" SET "TsPlus55" = "Ts"+55.6;
+    UPDATE "COFFlammable" SET "TsMinus55" = "Ts"-55.6;
+    UPDATE "COFFlammable" SET "FactAITcalc" = ("Ts"-"AIT"+55.6)/111.2;
+    UPDATE "COFFlammable" SET "FactAIT" = (CASE WHEN "TsPlus55" <= "AIT" THEN 0 ELSE (CASE WHEN "TsMinus55" >= "AIT" THEN 1  ELSE "FactAITcalc" END) END);
+    UPDATE "COFFlammable" SET "CA_cmd" = ("AIL_CA_cmd"*"FactAIT")+("AINL_CA_cmd"*(1-"FactAIT"));
+    UPDATE "COFFlammable" SET "CA_pi" = ("AIL_CA_pi"*"FactAIT")+("AINL_CA_pi"*(1-"FactAIT"));
+
+    --UPDATE "COFFlammable" SET "Final_CA_cmd" = (SELECT (SUM(c."CA_cmd")* SUM(c."GFFn") / Min(c."GFFtotal")) FROM  "COFFlammable" c WHERE c."EquipmentNo" = "COFFlammable"."EquipmentNo");
+    --UPDATE "COFFlammable" SET "Final_CA_pi" = (SELECT (SUM(c."CA_pi")* SUM(c."GFFn") / Min(c."GFFtotal")) FROM  "COFFlammable" c WHERE c."EquipmentNo" = "COFFlammable"."EquipmentNo");
+    	
+    END;
+    $BODY$;
+
+    --CALL USP_COF_CALCULATION();
+
+    --SELECT * FROM "COFFlammable"
+
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM "__EFMigrationsHistory" WHERE "MigrationId" = '20200817125328_Initial_Migration-V1') THEN
+    INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+    VALUES ('20200817125328_Initial_Migration-V1', '3.1.3');
+    END IF;
+END $$;
+
+
+UPDATE "PipeReport" SET  "InspectionYear" =2020;
+UPDATE "QuickLink" SET "QuickLinkName" = 'COF Master Records' WHERE "QuickLinkID" = 7;
+UPDATE "PipeMaster" SET "OverallStatus" = 'Over Due' WHERE "PipeMasterID" <=250;
+UPDATE "PipeMaster" SET "OverallStatus" = 'Good' WHERE "PipeMasterID" > 250;
+UPDATE "PipeMaster" SET "OverallStatus" = 'Acceptable' WHERE "PipeMasterID" > 600;
+UPDATE "PipeMaster" SET "OverallStatus" = 'Poor' WHERE "PipeMasterID" > 800;
+UPDATE "PipeMaster" SET "OverallStatus" = 'Low Critical' WHERE "PipeMasterID" > 900;
+UPDATE "PipeMaster" SET "OverallStatus" = 'No Due' WHERE "PipeMasterID" > 1100;
+
+
+
+    --------------------------------------------------------------------------------
+    -- POF IC calculation --
+    --------------------------------------------------------------------------------
+
+    CREATE OR REPLACE PROCEDURE SP_UPD_POF_IC(I_EQUIPMENT_NO VARCHAR(25)
+    ,I_PRESENT_YEAR NUMERIC
+    )
+    LANGUAGE plpgsql    
+    AS $BODY$ 
+
+    DECLARE 
+    V_CNT	INT;
+    V_YEAR_IN_SERVICE  NUMERIC;
+    V_NOM_DIA_D_INCHES NUMERIC;
+    V_NOM_THK_NT_INCHES NUMERIC;
+    V_DESIGN_TEMP_DEGF NUMERIC;
+    V_DESIGN_PRESSURE_P_PSI NUMERIC;
+    V_EFFECTIVE_CORROSION_RATE NUMERIC;
+    V_MATERIAL_STD VARCHAR(32);
+    V_MATERIAL_GRADE VARCHAR(32);
+    V_INJECTION_POINTS_INTERMITENT VARCHAR(1);
+    V_CORROSION_ALLOWANCE NUMERIC;
+    V_STRUCTURAL_MIN_THK NUMERIC;
+    V_OPTION_FOR_MIN_REQ_THK VARCHAR(100);
+    I_EFFICIENCY_OF_WELD_E  NUMERIC;
+    I_YOUNGS_MODULUS_Y     NUMERIC;
+    V_VERY_HIGH INT;
+    V_HIGH INT;
+    V_MEDIUM INT;
+    V_LOW INT;
+    V_NO INT;
+    V_USE_LICR VARCHAR(1);
+    V_USE_SICR VARCHAR(1);
+    V_THEORETICAL_CORROSION_RATE_TICR NUMERIC;
+    V_MEASURED_LONGTERM_CORROSION_RATE_LICR NUMERIC;
+    V_MEASURED_SHORTTERM_CORROSION_RATE_SICR NUMERIC;
+
+    V_LAST_MEASURED_THK_FOR_DIA_LMT NUMERIC;
+    V_LAST_MEASURED_YEAR_FOR_DIA_LMY NUMERIC;
+
+    V_YIELD_STRENGTH_KSI NUMERIC;
+    V_TENSILE_STREGTH_KSI NUMERIC;
+    V_EFFICIENCY_OF_WELD_E NUMERIC;
+    V_YOUNGS_MODULUS_Y NUMERIC;
+    V_ALLOWABLE_STRESS_PSI NUMERIC;
+
+    V_PRP_CONFIDENCE VARCHAR(15);
+    V_PRP_1 NUMERIC;
+    V_PRP_2 NUMERIC;
+    V_PRP_3 NUMERIC;
+
+    V_CONDITIONAL_PROBABILITY_1_A NUMERIC;
+    V_CONDITIONAL_PROBABILITY_1_B NUMERIC;
+    V_CONDITIONAL_PROBABILITY_1_C NUMERIC;
+    V_CONDITIONAL_PROBABILITY_1_D NUMERIC;
+    V_CONDITIONAL_PROBABILITY_1_E NUMERIC;
+    V_CONDITIONAL_PROBABILITY_2_A NUMERIC;
+    V_CONDITIONAL_PROBABILITY_2_B NUMERIC;
+    V_CONDITIONAL_PROBABILITY_2_C NUMERIC;
+    V_CONDITIONAL_PROBABILITY_2_D NUMERIC;
+    V_CONDITIONAL_PROBABILITY_2_E NUMERIC;
+    V_CONDITIONAL_PROBABILITY_3_A NUMERIC;
+    V_CONDITIONAL_PROBABILITY_3_B NUMERIC;
+    V_CONDITIONAL_PROBABILITY_3_C NUMERIC;
+    V_CONDITIONAL_PROBABILITY_3_D NUMERIC;
+    V_CONDITIONAL_PROBABILITY_3_E NUMERIC;
+
+    V_EFFECTIVE_AGE NUMERIC;
+    V_EFFECTIVE_THK NUMERIC;
+    V_MIN_REQ_THK NUMERIC;
+    V_EFFECTIVE_CORR_RATE NUMERIC;
+    V_ART NUMERIC;
+    V_FLOW_STRESS NUMERIC;
+    V_STENGTH_RATIO NUMERIC;
+    V_INSPECTION_EFFECTIVENESS_1 NUMERIC;
+    V_INSPECTION_EFFECTIVENESS_2 NUMERIC;
+    V_INSPECTION_EFFECTIVENESS_3 NUMERIC;
+    V_POSTERIOR_PROBABILITY_1 NUMERIC;
+    V_POSTERIOR_PROBABILITY_2 NUMERIC;
+    V_POSTERIOR_PROBABILITY_3 NUMERIC;
+    V_CAL_OF_BETA_COVT NUMERIC;
+    V_CAL_OF_BETA_COVSF NUMERIC;
+    V_CAL_OF_BETA_COVP NUMERIC;
+    V_CAL_OF_BETA_CONST_1 NUMERIC;
+    V_CAL_OF_BETA_CONST_2 NUMERIC;
+    V_CAL_OF_BETA_CONST_3 NUMERIC;
+    V_CAL_OF_BETA_1 NUMERIC;
+    V_CAL_OF_BETA_2 NUMERIC;
+    V_CAL_OF_BETA_3 NUMERIC;
+    V_CAL_OF_BETA_DS_VALUES_1 NUMERIC;
+    V_CAL_OF_BETA_DS_VALUES_2 NUMERIC;
+    V_CAL_OF_BETA_DS_VALUES_3 NUMERIC;
+    V_DAMAGE_FACTOR NUMERIC;
+    V_POF NUMERIC;
+    V_POF_EXPO NUMERIC;
+    V_AVAILABLE_THK NUMERIC;
+    V_REMAINING_LIFE NUMERIC;
+    V_HALF_LIFE NUMERIC;
+    V_POF_HALF_LIFE NUMERIC;
+    V_OVERALL_POF NUMERIC;
+    V_YIELD_STRENGTH_KSI1 VARCHAR(32);
+    BEGIN
+    V_CNT := 10;
+    RAISE INFO 'V_CNT %',V_CNT ;
+    ------ Start Get Pipe Master Details  -----
+
+    SELECT	
+    "YearInService"
+    ,"NominalDiameter"
+    ,"NominalThick"
+    ,"DesignTemperature"
+    ,"DesignPressure"
+    ,0
+    ,"MaterialStd"
+    ,"MaterialGrade"
+    ,'N'
+    ,"CorrosionAllowance"
+    ,"LastMeasuredThick_LMT"
+    ,"LastMeasuredYear_LMY"
+    ,'"LOW"'
+    ,"StructuralMinThk_SMT"
+    ,"MinReqThkOption_MRTO"
+    ,"JointEfficiency"
+    ,1
+    ,"AllowableStressMPA_S"
+    ,"YieldStrengthMPA_YS"
+    ,"TensileStrengthMPA_TS"
+    INTO
+    		 V_YEAR_IN_SERVICE
+    		,V_NOM_DIA_D_INCHES 
+    		,V_NOM_THK_NT_INCHES
+    		,V_DESIGN_TEMP_DEGF
+    		,V_DESIGN_PRESSURE_P_PSI
+    		,V_EFFECTIVE_CORROSION_RATE
+    		,V_MATERIAL_STD
+    		,V_MATERIAL_GRADE
+    		,V_INJECTION_POINTS_INTERMITENT
+    		,V_CORROSION_ALLOWANCE
+    		,V_LAST_MEASURED_THK_FOR_DIA_LMT
+    		,V_LAST_MEASURED_YEAR_FOR_DIA_LMY
+    		,V_PRP_CONFIDENCE
+    		,V_STRUCTURAL_MIN_THK
+    		,V_OPTION_FOR_MIN_REQ_THK
+    		,I_EFFICIENCY_OF_WELD_E
+    		,I_YOUNGS_MODULUS_Y
+    		,V_ALLOWABLE_STRESS_PSI
+    		,V_YIELD_STRENGTH_KSI
+    		,V_TENSILE_STREGTH_KSI		
+    FROM "PipeMaster" WHERE "EquipmentNo" = UPPER(TRIM(I_EQUIPMENT_NO));
+    ------ End Get Pipe Master Details  -----
+
+    ------ Start Get Inspection Confidence Details  -----
+
+     SELECT "VeryHigh"
+          ,"High"
+          ,"Medium"
+          ,"Low"
+          ,"Found"
+    	  ,"EffectiveCR"
+    	  ,"InjectionPoints"
+    	  ,"UseMeasuredLCR"
+    	  ,"UseMeasuredSCR"
+    	  ,"TheoriticalCR"
+    	  ,"MeasuredLCR"
+    	  ,"MeasuredSCR"
+    	  INTO
+    	  V_VERY_HIGH, V_HIGH, V_MEDIUM, V_LOW, V_NO
+    	  ,V_EFFECTIVE_CORROSION_RATE
+    	  ,V_INJECTION_POINTS_INTERMITENT
+    	  ,V_USE_LICR 
+    	  ,V_USE_SICR 
+          ,V_THEORETICAL_CORROSION_RATE_TICR 
+          ,V_MEASURED_LONGTERM_CORROSION_RATE_LICR 
+          ,V_MEASURED_SHORTTERM_CORROSION_RATE_SICR 
+    FROM "POF_IC"  WHERE "EquipmentNo" = UPPER(TRIM(I_EQUIPMENT_NO));  
+    ------ End Get Inspection Confidence Details  -----
+
+    ------ Start Get PRP Details  -----
+    --Begin try
+    SELECT "PRP_1"
+          ,"PRP_2"
+          ,"PRP_3"
+    INTO
+     V_PRP_1
+    ,V_PRP_2
+    ,V_PRP_3
+    FROM "TBL_PRP" WHERE "PRP_CONFIDENCE" = 'LOW';  --V_PRP_CONFIDENCE;
+    --end try
+    --begin catch
+    --			INSERT INTO ERROR_LOG (ErrorMessage,CodeLineNo,SqlName) VALUES(ERROR_MESSAGE(),ERROR_LINE(),ERROR_PROCEDURE());	
+    --end catch
+    ------ End Get PRP Details  -----
+
+    ------ Start Get Conditional Probability Details  -----
+    --Begin try
+    SELECT "A"
+          ,"B"
+          ,"C"
+          ,"D"
+          ,"E"
+    INTO
+    V_CONDITIONAL_PROBABILITY_1_A
+    ,V_CONDITIONAL_PROBABILITY_1_B
+    ,V_CONDITIONAL_PROBABILITY_1_C
+    ,V_CONDITIONAL_PROBABILITY_1_D
+    ,V_CONDITIONAL_PROBABILITY_1_E
+    FROM "TBL_COP" WHERE "COP_LEVEL" = 1;
+
+    SELECT "A"
+          ,"B"
+          ,"C"
+          ,"D"
+          ,"E"
+    INTO
+     V_CONDITIONAL_PROBABILITY_2_A
+    ,V_CONDITIONAL_PROBABILITY_2_B
+    ,V_CONDITIONAL_PROBABILITY_2_C
+    ,V_CONDITIONAL_PROBABILITY_2_D
+    ,V_CONDITIONAL_PROBABILITY_2_E
+    FROM "TBL_COP" WHERE "COP_LEVEL" = 2;
+
+    SELECT "A"
+          ,"B"
+          ,"C"
+          ,"D"
+          ,"E"
+    INTO
+     V_CONDITIONAL_PROBABILITY_3_A
+    ,V_CONDITIONAL_PROBABILITY_3_B
+    ,V_CONDITIONAL_PROBABILITY_3_C
+    ,V_CONDITIONAL_PROBABILITY_3_D
+    ,V_CONDITIONAL_PROBABILITY_3_E
+    FROM "TBL_COP" WHERE "COP_LEVEL" = 3;
+    --end try
+    --begin catch
+    --			INSERT INTO ERROR_LOG (ErrorMessage,CodeLineNo,SqlName) VALUES(ERROR_MESSAGE(),ERROR_LINE(),ERROR_PROCEDURE());	
+    --end catch
+    ------ End Get Conditional Probability Details  -----
+
+    --Begin try
+    ------ Start Get Calculations Details  -----
+    V_EFFECTIVE_AGE := I_PRESENT_YEAR - V_LAST_MEASURED_YEAR_FOR_DIA_LMY;
+    V_EFFECTIVE_THK := V_LAST_MEASURED_THK_FOR_DIA_LMT;
+    --V_EFFECTIVE_AGE := I_PRESENT_YEAR - V_YEAR_IN_SERVICE;
+    --V_EFFECTIVE_THK := V_NOM_THK_NT_INCHES;
+    RAISE INFO 'V_OPTION_FOR_MIN_REQ_THK %', V_OPTION_FOR_MIN_REQ_THK;
+    IF (V_OPTION_FOR_MIN_REQ_THK = 'PrThk') THEN
+
+    	V_MIN_REQ_THK := (V_DESIGN_PRESSURE_P_PSI * (V_NOM_DIA_D_INCHES / 2) / ((V_ALLOWABLE_STRESS_PSI * I_EFFICIENCY_OF_WELD_E) - (0.6 * V_DESIGN_PRESSURE_P_PSI)));
+
+    ELSIF (V_OPTION_FOR_MIN_REQ_THK = 'NomThk-CA') THEN
+
+    	V_MIN_REQ_THK := V_NOM_THK_NT_INCHES - V_CORROSION_ALLOWANCE;
+
+    ELSIF(V_OPTION_FOR_MIN_REQ_THK = 'STRUCTURAL_MIN_THK') THEN
+
+    	V_MIN_REQ_THK := V_STRUCTURAL_MIN_THK;
+
+    END IF;
+    IF (V_INJECTION_POINTS_INTERMITENT = 'Y') THEN
+
+    	V_EFFECTIVE_CORR_RATE := V_EFFECTIVE_CORROSION_RATE * 2;
+
+    ELSE
+
+    	V_EFFECTIVE_CORR_RATE := V_EFFECTIVE_CORROSION_RATE;
+
+    END IF;
+    V_ART := (V_EFFECTIVE_CORR_RATE * (V_EFFECTIVE_AGE / V_EFFECTIVE_THK));
+    V_FLOW_STRESS := (((V_YIELD_STRENGTH_KSI + V_TENSILE_STREGTH_KSI) / 2) * 1.1 * I_EFFICIENCY_OF_WELD_E);
+    V_STENGTH_RATIO := (((V_ALLOWABLE_STRESS_PSI /1000) * I_EFFICIENCY_OF_WELD_E * V_MIN_REQ_THK )/(V_FLOW_STRESS * V_EFFECTIVE_THK));
+    ------ End Get Calculations Details  -----
+
+    ------ Start Get Inspection Effectiveness Factor Details  -----
+    V_INSPECTION_EFFECTIVENESS_1 := (V_PRP_1 *(POWER(V_CONDITIONAL_PROBABILITY_1_A ,V_VERY_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_1_B,V_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_1_C,V_MEDIUM )*POWER(V_CONDITIONAL_PROBABILITY_1_D,V_LOW )));
+    V_INSPECTION_EFFECTIVENESS_2 := (V_PRP_2 *(POWER(V_CONDITIONAL_PROBABILITY_2_A ,V_VERY_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_2_B,V_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_2_C,V_MEDIUM )*POWER(V_CONDITIONAL_PROBABILITY_2_D,V_LOW )));
+    V_INSPECTION_EFFECTIVENESS_3 := (V_PRP_3 *(POWER(V_CONDITIONAL_PROBABILITY_3_A ,V_VERY_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_3_B,V_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_3_C,V_MEDIUM )*POWER(V_CONDITIONAL_PROBABILITY_3_D,V_LOW )));
+    ------ End Get Inspection Effectiveness Factor Details  -----
+
+    ------ Start Get Calculation of Posterior Probability Details  -----
+    V_POSTERIOR_PROBABILITY_1 := (V_INSPECTION_EFFECTIVENESS_1 / (V_INSPECTION_EFFECTIVENESS_1 + V_INSPECTION_EFFECTIVENESS_2 + V_INSPECTION_EFFECTIVENESS_3));
+    V_POSTERIOR_PROBABILITY_2 := (V_INSPECTION_EFFECTIVENESS_2 / (V_INSPECTION_EFFECTIVENESS_1 + V_INSPECTION_EFFECTIVENESS_2 + V_INSPECTION_EFFECTIVENESS_3));
+    V_POSTERIOR_PROBABILITY_3 := (V_INSPECTION_EFFECTIVENESS_3 / (V_INSPECTION_EFFECTIVENESS_1 + V_INSPECTION_EFFECTIVENESS_2 + V_INSPECTION_EFFECTIVENESS_3));
+    ------ End Get Calculation of Posterior Probability Details  -----
+
+    ------ Start Get Calculation of Beta 1,2,3 Details  -----
+    V_CAL_OF_BETA_COVT := 0.2;
+    V_CAL_OF_BETA_COVSF := 0.2;
+    V_CAL_OF_BETA_COVP := 0.05;
+    V_CAL_OF_BETA_CONST_1 := 1;
+    V_CAL_OF_BETA_CONST_2 := 2;
+    V_CAL_OF_BETA_CONST_3 := 4;
+    V_CAL_OF_BETA_1 := ((POWER(V_CAL_OF_BETA_CONST_1 ,2) * POWER(V_ART ,2) * POWER(V_CAL_OF_BETA_COVT ,2))+(POWER(1-(V_CAL_OF_BETA_CONST_1 * V_ART ),2))*(POWER(V_CAL_OF_BETA_COVSF ,2))+(POWER(V_STENGTH_RATIO ,2)*POWER(V_CAL_OF_BETA_COVP ,2)));
+    V_CAL_OF_BETA_2 := ((POWER(V_CAL_OF_BETA_CONST_2 ,2) * POWER(V_ART ,2) * POWER(V_CAL_OF_BETA_COVT ,2))+(POWER(1-(V_CAL_OF_BETA_CONST_2 * V_ART ),2))*(POWER(V_CAL_OF_BETA_COVSF ,2))+(POWER(V_STENGTH_RATIO ,2)*POWER(V_CAL_OF_BETA_COVP ,2)));
+    V_CAL_OF_BETA_3 := ((POWER(V_CAL_OF_BETA_CONST_3 ,2) * POWER(V_ART ,2) * POWER(V_CAL_OF_BETA_COVT ,2))+(POWER(1-(V_CAL_OF_BETA_CONST_3 * V_ART ),2))*(POWER(V_CAL_OF_BETA_COVSF ,2))+(POWER(V_STENGTH_RATIO ,2)*POWER(V_CAL_OF_BETA_COVP ,2)));
+    V_CAL_OF_BETA_DS_VALUES_1 := ((1 - ( V_CAL_OF_BETA_CONST_1 * V_ART ) - V_STENGTH_RATIO )/SQRT(V_CAL_OF_BETA_1));
+    V_CAL_OF_BETA_DS_VALUES_2 := ((1 - ( V_CAL_OF_BETA_CONST_2 * V_ART ) - V_STENGTH_RATIO )/SQRT(V_CAL_OF_BETA_2));
+    V_CAL_OF_BETA_DS_VALUES_3 := ((1 - ( V_CAL_OF_BETA_CONST_3 * V_ART ) - V_STENGTH_RATIO )/SQRT(V_CAL_OF_BETA_3));
+    ------ End Get Calculation of Beta 1,2,3 Details  -----
+
+    ------ Start Get Calculation of Base Damage Factor & POF Details  -----
+    V_DAMAGE_FACTOR := (((((V_POSTERIOR_PROBABILITY_1 ) * udf_NORMSDIST(-(V_CAL_OF_BETA_DS_VALUES_1))) + ((V_POSTERIOR_PROBABILITY_2) * udf_NORMSDIST(-(V_CAL_OF_BETA_DS_VALUES_2)))+((V_POSTERIOR_PROBABILITY_3) * udf_NORMSDIST(-(V_CAL_OF_BETA_DS_VALUES_3))))/((0.000156))));
+    V_POF_EXPO := ((3.06* (0.00001)) * V_DAMAGE_FACTOR);
+    V_POF := abs(log(V_POF_EXPO));
+    V_AVAILABLE_THK := V_EFFECTIVE_THK - V_MIN_REQ_THK; 
+    V_REMAINING_LIFE := V_AVAILABLE_THK / V_EFFECTIVE_CORR_RATE;
+    V_HALF_LIFE := V_REMAINING_LIFE / 2;
+    -- SET V_POF_HALF_LIFE 
+    -- SET V_OVERALL_POF
+    ------ End Get Calculation of Base Damage Factor & POF Details  -----
+    --end try
+    --begin catch
+    --			INSERT INTO ERROR_LOG (ErrorMessage,CodeLineNo,SqlName) VALUES(ERROR_MESSAGE(),ERROR_LINE(),ERROR_PROCEDURE());	
+    --end catch
+
+    -- Update POF_IC details  --
+    UPDATE "POF_IC" SET "POF" = ROUND(V_POF::NUMERIC, 5), "DamageFactor"=ROUND(V_DAMAGE_FACTOR::NUMERIC, 5), "Art"=ROUND(V_ART::NUMERIC, 5), "StrengthRatio" = ROUND(V_STENGTH_RATIO::NUMERIC, 5) WHERE "EquipmentNo"=I_EQUIPMENT_NO;
+    IF EXISTS (SELECT 1 FROM "TBL_POF_IC" WHERE "EQUIPMENT_NO" = I_EQUIPMENT_NO AND "PRESENT_YEAR" = cast(I_PRESENT_YEAR AS VARCHAR)) THEN
+     UPDATE "TBL_POF_IC" SET	 	"YEAR_IN_SERVICE"						=	cast(V_YEAR_IN_SERVICE AS VARCHAR)
+    						,"NOM_DIA_D_INCHES"					=	cast(V_NOM_DIA_D_INCHES AS VARCHAR)
+    						,"NOM_THK_NT_INCHES"					=	cast(V_NOM_THK_NT_INCHES AS VARCHAR)
+    						,"DESIGN_TEMP_DEGF"					=	cast(V_DESIGN_TEMP_DEGF AS VARCHAR)
+    						,"DESIGN_PRESSURE_P_PSI"				=	cast(V_DESIGN_PRESSURE_P_PSI AS VARCHAR)
+    						,"EFFECTIVE_CORROSION_RATE"			=	cast(V_EFFECTIVE_CORROSION_RATE AS VARCHAR)
+    						,"MATERIAL_STD"						=	cast(V_MATERIAL_STD AS VARCHAR)
+    						,"MATERIAL_GRADE"						=	cast(V_MATERIAL_GRADE AS VARCHAR)
+    						,"INJECTION_POINTS_INTERMITENT"		=	cast(V_INJECTION_POINTS_INTERMITENT AS VARCHAR)
+    						,"CORROSION_ALLOWANCE"				=	cast(V_CORROSION_ALLOWANCE AS VARCHAR)
+    						,"VERY_HIGH"						=	cast(V_VERY_HIGH AS VARCHAR)
+    						,"HIGH"								=	cast(V_HIGH AS VARCHAR)
+    						,"MEDIUM"							=	cast(V_MEDIUM AS VARCHAR)
+    						,"LOW"								=	cast(V_LOW AS VARCHAR)
+    						,"NO"								=	cast(V_NO AS VARCHAR)
+    						,"LAST_MEASURED_THK_FOR_DIA_LMT"		=	cast(V_LAST_MEASURED_THK_FOR_DIA_LMT AS VARCHAR)
+    						,"LAST_MEASURED_YEAR_FOR_DIA_LMY"		=	cast(V_LAST_MEASURED_YEAR_FOR_DIA_LMY AS VARCHAR)
+    						,"YIELD_STRENGTH_KSI"					=	cast(V_YIELD_STRENGTH_KSI AS VARCHAR)
+    						,"TENSILE_STREGTH_KSI"				=	cast(V_TENSILE_STREGTH_KSI AS VARCHAR)
+    						
+    						,"EFFICIENCY_OF_WELD_E"				=	cast(I_EFFICIENCY_OF_WELD_E AS VARCHAR) 
+    						,"YOUNGS_MODULUS_Y"					=	cast(I_YOUNGS_MODULUS_Y AS VARCHAR)     
+    						,"ALLOWABLE_STRESS_PSI"				=	cast(V_ALLOWABLE_STRESS_PSI AS VARCHAR)
+    						,"PRP_1"								=	cast(V_PRP_1 AS VARCHAR)
+    						,"PRP_2"								=	cast(V_PRP_2 AS VARCHAR)
+    						,"PRP_3"								=	cast(V_PRP_3 AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_1_A"		=	cast(V_CONDITIONAL_PROBABILITY_1_A AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_1_B"		=	cast(V_CONDITIONAL_PROBABILITY_1_B AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_1_C"		=	cast(V_CONDITIONAL_PROBABILITY_1_C AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_1_D"		=	cast(V_CONDITIONAL_PROBABILITY_1_D AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_1_E"		=	cast(V_CONDITIONAL_PROBABILITY_1_E AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_2_A"		=	cast(V_CONDITIONAL_PROBABILITY_2_A AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_2_B"		=	cast(V_CONDITIONAL_PROBABILITY_2_B AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_2_C"		=	cast(V_CONDITIONAL_PROBABILITY_2_C AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_2_D"		=	cast(V_CONDITIONAL_PROBABILITY_2_D AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_2_E"		=	cast(V_CONDITIONAL_PROBABILITY_2_E AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_3_A"		=	cast(V_CONDITIONAL_PROBABILITY_3_A AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_3_B"		=	cast(V_CONDITIONAL_PROBABILITY_3_B AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_3_C"		=	cast(V_CONDITIONAL_PROBABILITY_3_C AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_3_D"		=	cast(V_CONDITIONAL_PROBABILITY_3_D AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_3_E"		=	cast(V_CONDITIONAL_PROBABILITY_3_E AS VARCHAR)
+    						,"EFFECTIVE_THK"						=	cast(V_EFFECTIVE_THK AS VARCHAR)						
+    						,"EFFECTIVE_AGE"						=	cast(V_EFFECTIVE_AGE AS VARCHAR)						
+    						,"MIN_REQ_THK"						=	cast(V_MIN_REQ_THK AS VARCHAR)						
+    						,"EFFECTIVE_CORR_RATE"				=	cast(V_EFFECTIVE_CORR_RATE AS VARCHAR)				
+    						,"ART"								=	cast(V_ART AS VARCHAR)								
+    						,"FLOW_STRESS"						=	cast(V_FLOW_STRESS AS VARCHAR)					
+    						,"STENGTH_RATIO"						=	cast(V_STENGTH_RATIO AS VARCHAR)						
+    						,"INSPECTION_EFFECTIVENESS_1"			=	cast(V_INSPECTION_EFFECTIVENESS_1 AS VARCHAR)			
+    						,"INSPECTION_EFFECTIVENESS_2"			=	cast(V_INSPECTION_EFFECTIVENESS_2 AS VARCHAR)			
+    						,"INSPECTION_EFFECTIVENESS_3"			=	cast(V_INSPECTION_EFFECTIVENESS_3 AS VARCHAR)			
+    						,"POSTERIOR_PROBABILITY_1"			=	cast(V_POSTERIOR_PROBABILITY_1 AS VARCHAR)			
+    						,"POSTERIOR_PROBABILITY_2"			=	cast(V_POSTERIOR_PROBABILITY_2 AS VARCHAR)			
+    						,"POSTERIOR_PROBABILITY_3"			=	cast(V_POSTERIOR_PROBABILITY_3 AS VARCHAR)			
+    						,"CAL_OF_BETA_COVT"					=	cast(V_CAL_OF_BETA_COVT AS VARCHAR)					
+    						,"CAL_OF_BETA_COVSF"					=	cast(V_CAL_OF_BETA_COVSF AS VARCHAR)					
+    						,"CAL_OF_BETA_COVP"					=	cast(V_CAL_OF_BETA_COVP AS VARCHAR)					
+    						,"CAL_OF_BETA_CONST_1"				=	cast(V_CAL_OF_BETA_CONST_1 AS VARCHAR)				
+    						,"CAL_OF_BETA_CONST_2"				=	cast(V_CAL_OF_BETA_CONST_2 AS VARCHAR)				
+    						,"CAL_OF_BETA_CONST_3"				=	cast(V_CAL_OF_BETA_CONST_3 AS VARCHAR)				
+    						,"CAL_OF_BETA_1"						=	cast(V_CAL_OF_BETA_1 AS VARCHAR)						
+    						,"CAL_OF_BETA_2"						=	cast(V_CAL_OF_BETA_2 AS VARCHAR)						
+    						,"CAL_OF_BETA_3"						=	cast(V_CAL_OF_BETA_3 AS VARCHAR)						
+    						,"CAL_OF_BETA_DS_VALUES_1"			=	cast(V_CAL_OF_BETA_DS_VALUES_1 AS VARCHAR)			
+    						,"CAL_OF_BETA_DS_VALUES_2"			=	cast(V_CAL_OF_BETA_DS_VALUES_2 AS VARCHAR)			
+    						,"CAL_OF_BETA_DS_VALUES_3"			=	cast(V_CAL_OF_BETA_DS_VALUES_3 AS VARCHAR)			
+    						,"DAMAGE_FACTOR"						=	cast(ROUND(V_DAMAGE_FACTOR::NUMERIC, 5) AS VARCHAR)						
+    						,"POF"								=	cast(ROUND(V_POF::NUMERIC) AS VARCHAR)								
+    						,"POF_EXPO"							=	cast(ROUND(V_POF_EXPO::NUMERIC, 5) AS VARCHAR)							
+    						,"AVAILABLE_THK"						=	cast(V_AVAILABLE_THK AS VARCHAR)						
+    						,"REMAINING_LIFE"						=	cast(V_REMAINING_LIFE AS VARCHAR)						
+    						,"HALF_LIFE"							=	cast(V_HALF_LIFE AS VARCHAR)						
+    						,"POF_HALF_LIFE"						=	cast(V_POF_HALF_LIFE AS VARCHAR)						
+    						,"OVERALL_POF"						=	cast(V_OVERALL_POF  AS VARCHAR)		
+    						,"USE_LICR"                         =   V_USE_LICR
+    ,"USE_SICR"                                                 =   V_USE_SICR
+    ,"THEORETICAL_CORROSION_RATE_TICR"                              = cast(V_THEORETICAL_CORROSION_RATE_TICR  AS VARCHAR)
+    ,"MEASURED_LONGTERM_CORROSION_RATE_LICR"                    = cast(V_MEASURED_LONGTERM_CORROSION_RATE_LICR   AS VARCHAR)
+    ,"MEASURED_SHORTTERM_CORROSION_RATE_SICR"                    = cast(V_MEASURED_SHORTTERM_CORROSION_RATE_SICR   AS VARCHAR)
+    						,"ModifiedDate"                     = NOW()
+    						,"ModifiedBy"                     = 'SYSADMIN'
+    WHERE "EQUIPMENT_NO" = I_EQUIPMENT_NO AND "PRESENT_YEAR" = cast(I_PRESENT_YEAR AS VARCHAR); 
+    ELSE
+    INSERT INTO "TBL_POF_IC" (	
+    "EQUIPMENT_NO"
+    ,"PRESENT_YEAR"
+    ,"CORROSION_TYPE"
+    ,"YEAR_IN_SERVICE"								
+    ,"NOM_DIA_D_INCHES"								
+    ,"NOM_THK_NT_INCHES"							
+    ,"DESIGN_TEMP_DEGF"								
+    ,"DESIGN_PRESSURE_P_PSI"						
+    ,"EFFECTIVE_CORROSION_RATE"						
+    ,"MATERIAL_STD"									
+    ,"MATERIAL_GRADE"								
+    ,"INJECTION_POINTS_INTERMITENT"					
+    ,"CORROSION_ALLOWANCE"							
+    ,"VERY_HIGH"									
+    ,"HIGH"											
+    ,"MEDIUM"										
+    ,"LOW"											
+    ,"NO"											
+    ,"LAST_MEASURED_THK_FOR_DIA_LMT"				
+    ,"LAST_MEASURED_YEAR_FOR_DIA_LMY"				
+    ,"YIELD_STRENGTH_KSI"							
+    ,"TENSILE_STREGTH_KSI"									
+    ,"EFFICIENCY_OF_WELD_E"							
+    ,"YOUNGS_MODULUS_Y"								
+    ,"ALLOWABLE_STRESS_PSI"							
+    ,"PRP_1"										
+    ,"PRP_2"										
+    ,"PRP_3"										
+    ,"CONDITIONAL_PROBABILITY_1_A"					
+    ,"CONDITIONAL_PROBABILITY_1_B"					
+    ,"CONDITIONAL_PROBABILITY_1_C"					
+    ,"CONDITIONAL_PROBABILITY_1_D"					
+    ,"CONDITIONAL_PROBABILITY_1_E"			        
+    ,"CONDITIONAL_PROBABILITY_2_A"			        
+    ,"CONDITIONAL_PROBABILITY_2_B"			        
+    ,"CONDITIONAL_PROBABILITY_2_C"			        
+    ,"CONDITIONAL_PROBABILITY_2_D"			        
+    ,"CONDITIONAL_PROBABILITY_2_E"			        
+    ,"CONDITIONAL_PROBABILITY_3_A"			        
+    ,"CONDITIONAL_PROBABILITY_3_B"			        
+    ,"CONDITIONAL_PROBABILITY_3_C"			        
+    ,"CONDITIONAL_PROBABILITY_3_D"			        
+    ,"CONDITIONAL_PROBABILITY_3_E"			        
+    ,"EFFECTIVE_THK"						        	
+    ,"EFFECTIVE_AGE"						        	
+    ,"MIN_REQ_THK"							        
+    ,"EFFECTIVE_CORR_RATE"					        
+    ,"ART"									        
+    ,"FLOW_STRESS"							        
+    ,"STENGTH_RATIO"						        	
+    ,"INSPECTION_EFFECTIVENESS_1"			        	
+    ,"INSPECTION_EFFECTIVENESS_2"			        	
+    ,"INSPECTION_EFFECTIVENESS_3"			        	
+    ,"POSTERIOR_PROBABILITY_1"				        
+    ,"POSTERIOR_PROBABILITY_2"				        
+    ,"POSTERIOR_PROBABILITY_3"				        
+    ,"CAL_OF_BETA_COVT"						        
+    ,"CAL_OF_BETA_COVSF"					        	
+    ,"CAL_OF_BETA_COVP"						        
+    ,"CAL_OF_BETA_CONST_1"					        
+    ,"CAL_OF_BETA_CONST_2"					        
+    ,"CAL_OF_BETA_CONST_3"					        
+    ,"CAL_OF_BETA_1"						        	
+    ,"CAL_OF_BETA_2"						        	
+    ,"CAL_OF_BETA_3"						        	
+    ,"CAL_OF_BETA_DS_VALUES_1"				        
+    ,"CAL_OF_BETA_DS_VALUES_2"				        
+    ,"CAL_OF_BETA_DS_VALUES_3"				        
+    ,"DAMAGE_FACTOR"
+    ,"POF_EXPO"							        	
+    ,"POF"        
+    ,"AVAILABLE_THK"						        	
+    ,"REMAINING_LIFE"						        	
+    ,"HALF_LIFE"							        
+    ,"POF_HALF_LIFE"						        	
+    ,"OVERALL_POF"	
+    ,"USE_LICR" 
+    ,"USE_SICR" 
+    ,"THEORETICAL_CORROSION_RATE_TICR" 
+    ,"MEASURED_LONGTERM_CORROSION_RATE_LICR"
+    ,"MEASURED_SHORTTERM_CORROSION_RATE_SICR" 	
+    ,"CreatedDate"                     	        
+    ,"CreatedBy" 	
+    )
+    VALUES(
+    I_EQUIPMENT_NO
+    ,cast(I_PRESENT_YEAR AS VARCHAR)
+    ,'IC'	
+    ,cast(V_YEAR_IN_SERVICE AS VARCHAR)						
+    ,cast(V_NOM_DIA_D_INCHES AS VARCHAR)
+    ,cast(V_NOM_THK_NT_INCHES AS VARCHAR)
+    ,cast(V_DESIGN_TEMP_DEGF AS VARCHAR)
+    ,cast(V_DESIGN_PRESSURE_P_PSI AS VARCHAR)
+    ,cast(V_EFFECTIVE_CORROSION_RATE AS VARCHAR)
+    ,cast(V_MATERIAL_STD AS VARCHAR)
+    ,cast(V_MATERIAL_GRADE AS VARCHAR)
+    ,cast(V_INJECTION_POINTS_INTERMITENT AS VARCHAR)
+    ,cast(V_CORROSION_ALLOWANCE AS VARCHAR)
+    ,cast(V_VERY_HIGH AS VARCHAR)
+    ,cast(V_HIGH AS VARCHAR)
+    ,cast(V_MEDIUM AS VARCHAR)
+    ,cast(V_LOW AS VARCHAR)
+    ,cast(V_NO AS VARCHAR)
+    ,cast(V_LAST_MEASURED_THK_FOR_DIA_LMT AS VARCHAR)
+    ,cast(V_LAST_MEASURED_YEAR_FOR_DIA_LMY AS VARCHAR)
+    ,cast(V_YIELD_STRENGTH_KSI AS VARCHAR)
+    ,cast(V_TENSILE_STREGTH_KSI AS VARCHAR)				
+    ,cast(I_EFFICIENCY_OF_WELD_E AS VARCHAR) 
+    ,cast(I_YOUNGS_MODULUS_Y AS VARCHAR)     
+    ,cast(V_ALLOWABLE_STRESS_PSI AS VARCHAR)
+    ,cast(V_PRP_1 AS VARCHAR)
+    ,cast(V_PRP_2 AS VARCHAR)
+    ,cast(V_PRP_3 AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_1_A AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_1_B AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_1_C AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_1_D AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_1_E AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_2_A AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_2_B AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_2_C AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_2_D AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_2_E AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_3_A AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_3_B AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_3_C AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_3_D AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_3_E AS VARCHAR)
+    ,cast(V_EFFECTIVE_THK AS VARCHAR)					
+    ,cast(V_EFFECTIVE_AGE AS VARCHAR)					
+    ,cast(V_MIN_REQ_THK AS VARCHAR)						
+    ,cast(V_EFFECTIVE_CORR_RATE AS VARCHAR)				
+    ,cast(V_ART AS VARCHAR)								
+    ,cast(V_FLOW_STRESS AS VARCHAR)					
+    ,cast(V_STENGTH_RATIO AS VARCHAR)					
+    ,cast(V_INSPECTION_EFFECTIVENESS_1 AS VARCHAR)		
+    ,cast(V_INSPECTION_EFFECTIVENESS_2 AS VARCHAR)		
+    ,cast(V_INSPECTION_EFFECTIVENESS_3 AS VARCHAR)		
+    ,cast(V_POSTERIOR_PROBABILITY_1 AS VARCHAR)			
+    ,cast(V_POSTERIOR_PROBABILITY_2 AS VARCHAR)			
+    ,cast(V_POSTERIOR_PROBABILITY_3 AS VARCHAR)			
+    ,cast(V_CAL_OF_BETA_COVT AS VARCHAR)					
+    ,cast(V_CAL_OF_BETA_COVSF AS VARCHAR)				
+    ,cast(V_CAL_OF_BETA_COVP AS VARCHAR)					
+    ,cast(V_CAL_OF_BETA_CONST_1 AS VARCHAR)				
+    ,cast(V_CAL_OF_BETA_CONST_2 AS VARCHAR)				
+    ,cast(V_CAL_OF_BETA_CONST_3 AS VARCHAR)				
+    ,cast(V_CAL_OF_BETA_1 AS VARCHAR)					
+    ,cast(V_CAL_OF_BETA_2 AS VARCHAR)					
+    ,cast(V_CAL_OF_BETA_3 AS VARCHAR)					
+    ,cast(V_CAL_OF_BETA_DS_VALUES_1 AS VARCHAR)			
+    ,cast(V_CAL_OF_BETA_DS_VALUES_2 AS VARCHAR)			
+    ,cast(V_CAL_OF_BETA_DS_VALUES_3 AS VARCHAR)			
+    ,cast(V_DAMAGE_FACTOR AS VARCHAR)					
+    ,cast(ROUND(V_POF_EXPO::NUMERIC, 5) AS VARCHAR)								
+    ,cast(ROUND(V_POF::NUMERIC) AS VARCHAR)							
+    ,cast(V_AVAILABLE_THK AS VARCHAR)					
+    ,cast(V_REMAINING_LIFE AS VARCHAR)					
+    ,cast(V_HALF_LIFE AS VARCHAR)						
+    ,cast(V_POF_HALF_LIFE AS VARCHAR)					
+    ,cast(V_OVERALL_POF  AS VARCHAR)
+    ,V_USE_LICR 
+    ,V_USE_SICR 
+    ,cast(ROUND(V_THEORETICAL_CORROSION_RATE_TICR::NUMERIC, 5)   AS VARCHAR)  
+    ,cast(ROUND(V_MEASURED_LONGTERM_CORROSION_RATE_LICR::NUMERIC, 5)   AS VARCHAR)
+    ,cast(ROUND(V_MEASURED_SHORTTERM_CORROSION_RATE_SICR::NUMERIC, 5)   AS VARCHAR)
+    ,NOW()
+    ,'SYSADMIN'
+    );
+
+    END IF;
+    END;
+    $BODY$ ;
+
+    --CALL sp_upd_pof_ic ('P01.AL1001',2027);
+
+    -- POF EC calculation
+
+    CREATE OR REPLACE PROCEDURE SP_UPD_POF_EC(I_EQUIPMENT_NO VARCHAR(25)
+    ,I_PRESENT_YEAR NUMERIC
+    )
+    LANGUAGE plpgsql    
+    AS $BODY$ 
+
+    DECLARE 
+    V_CNT	INT;
+    V_YEAR_IN_SERVICE  NUMERIC;
+    V_NOM_DIA_D_INCHES NUMERIC;
+    V_NOM_THK_NT_INCHES NUMERIC;
+    V_DESIGN_TEMP_DEGF NUMERIC;
+    V_DESIGN_PRESSURE_P_PSI NUMERIC;
+    V_EFFECTIVE_CORROSION_RATE NUMERIC;
+    V_MATERIAL_STD VARCHAR(32);
+    V_MATERIAL_GRADE VARCHAR(32);
+    V_INJECTION_POINTS_INTERMITENT VARCHAR(1);
+    V_CORROSION_ALLOWANCE NUMERIC;
+    V_STRUCTURAL_MIN_THK NUMERIC;
+    V_OPTION_FOR_MIN_REQ_THK VARCHAR(100);
+    I_EFFICIENCY_OF_WELD_E  NUMERIC;
+    I_YOUNGS_MODULUS_Y     NUMERIC;
+    V_VERY_HIGH INT;
+    V_HIGH INT;
+    V_MEDIUM INT;
+    V_LOW INT;
+    V_NO INT;
+    V_USE_LICR VARCHAR(1);
+    V_USE_SICR VARCHAR(1);
+    V_THEORETICAL_CORROSION_RATE_TICR NUMERIC;
+    V_MEASURED_LONGTERM_CORROSION_RATE_LICR NUMERIC;
+    V_MEASURED_SHORTTERM_CORROSION_RATE_SICR NUMERIC;
+
+    V_LAST_MEASURED_THK_FOR_DIA_LMT NUMERIC;
+    V_LAST_MEASURED_YEAR_FOR_DIA_LMY NUMERIC;
+
+    V_YIELD_STRENGTH_KSI NUMERIC;
+    V_TENSILE_STREGTH_KSI NUMERIC;
+    V_EFFICIENCY_OF_WELD_E NUMERIC;
+    V_YOUNGS_MODULUS_Y NUMERIC;
+    V_ALLOWABLE_STRESS_PSI NUMERIC;
+
+    V_PRP_CONFIDENCE VARCHAR(15);
+    V_PRP_1 NUMERIC;
+    V_PRP_2 NUMERIC;
+    V_PRP_3 NUMERIC;
+
+    V_CONDITIONAL_PROBABILITY_1_A NUMERIC;
+    V_CONDITIONAL_PROBABILITY_1_B NUMERIC;
+    V_CONDITIONAL_PROBABILITY_1_C NUMERIC;
+    V_CONDITIONAL_PROBABILITY_1_D NUMERIC;
+    V_CONDITIONAL_PROBABILITY_1_E NUMERIC;
+    V_CONDITIONAL_PROBABILITY_2_A NUMERIC;
+    V_CONDITIONAL_PROBABILITY_2_B NUMERIC;
+    V_CONDITIONAL_PROBABILITY_2_C NUMERIC;
+    V_CONDITIONAL_PROBABILITY_2_D NUMERIC;
+    V_CONDITIONAL_PROBABILITY_2_E NUMERIC;
+    V_CONDITIONAL_PROBABILITY_3_A NUMERIC;
+    V_CONDITIONAL_PROBABILITY_3_B NUMERIC;
+    V_CONDITIONAL_PROBABILITY_3_C NUMERIC;
+    V_CONDITIONAL_PROBABILITY_3_D NUMERIC;
+    V_CONDITIONAL_PROBABILITY_3_E NUMERIC;
+
+    V_EFFECTIVE_AGE NUMERIC;
+    V_EFFECTIVE_THK NUMERIC;
+    V_MIN_REQ_THK NUMERIC;
+    V_EFFECTIVE_CORR_RATE NUMERIC;
+    V_ART NUMERIC;
+    V_FLOW_STRESS NUMERIC;
+    V_STENGTH_RATIO NUMERIC;
+    V_INSPECTION_EFFECTIVENESS_1 NUMERIC;
+    V_INSPECTION_EFFECTIVENESS_2 NUMERIC;
+    V_INSPECTION_EFFECTIVENESS_3 NUMERIC;
+    V_POSTERIOR_PROBABILITY_1 NUMERIC;
+    V_POSTERIOR_PROBABILITY_2 NUMERIC;
+    V_POSTERIOR_PROBABILITY_3 NUMERIC;
+    V_CAL_OF_BETA_COVT NUMERIC;
+    V_CAL_OF_BETA_COVSF NUMERIC;
+    V_CAL_OF_BETA_COVP NUMERIC;
+    V_CAL_OF_BETA_CONST_1 NUMERIC;
+    V_CAL_OF_BETA_CONST_2 NUMERIC;
+    V_CAL_OF_BETA_CONST_3 NUMERIC;
+    V_CAL_OF_BETA_1 NUMERIC;
+    V_CAL_OF_BETA_2 NUMERIC;
+    V_CAL_OF_BETA_3 NUMERIC;
+    V_CAL_OF_BETA_DS_VALUES_1 NUMERIC;
+    V_CAL_OF_BETA_DS_VALUES_2 NUMERIC;
+    V_CAL_OF_BETA_DS_VALUES_3 NUMERIC;
+    V_DAMAGE_FACTOR NUMERIC;
+    V_POF NUMERIC;
+    V_POF_EXPO NUMERIC;
+    V_AVAILABLE_THK NUMERIC;
+    V_REMAINING_LIFE NUMERIC;
+    V_HALF_LIFE NUMERIC;
+    V_POF_HALF_LIFE NUMERIC;
+    V_OVERALL_POF NUMERIC;
+    V_YIELD_STRENGTH_KSI1 VARCHAR(32);
+    BEGIN
+    V_CNT := 10;
+    RAISE INFO 'V_CNT %',V_CNT ;
+    ------ Start Get Pipe Master Details  -----
+
+
+    SELECT	
+    "YearInService"
+    ,"NominalDiameter"
+    ,"NominalThick"
+    ,"DesignTemperature"
+    ,"DesignPressure"
+    ,0
+    ,"MaterialStd"
+    ,"MaterialGrade"
+    ,'N'
+    ,"CorrosionAllowance"
+    ,"LastMeasuredThick_LMT"
+    ,"LastMeasuredYear_LMY"
+    ,'"LOW"'
+    ,"StructuralMinThk_SMT"
+    ,"MinReqThkOption_MRTO"
+    ,"JointEfficiency"
+    ,1
+    ,"AllowableStressMPA_S"
+    ,"YieldStrengthMPA_YS"
+    ,"TensileStrengthMPA_TS"
+
+    INTO
+    		 V_YEAR_IN_SERVICE
+    		,V_NOM_DIA_D_INCHES 
+    		,V_NOM_THK_NT_INCHES
+    		,V_DESIGN_TEMP_DEGF
+    		,V_DESIGN_PRESSURE_P_PSI
+    		,V_EFFECTIVE_CORROSION_RATE
+    		,V_MATERIAL_STD
+    		,V_MATERIAL_GRADE
+    		,V_INJECTION_POINTS_INTERMITENT
+    		,V_CORROSION_ALLOWANCE
+    		,V_LAST_MEASURED_THK_FOR_DIA_LMT
+    		,V_LAST_MEASURED_YEAR_FOR_DIA_LMY
+    		,V_PRP_CONFIDENCE
+    		,V_STRUCTURAL_MIN_THK
+    		,V_OPTION_FOR_MIN_REQ_THK
+    		,I_EFFICIENCY_OF_WELD_E
+    		,I_YOUNGS_MODULUS_Y
+    		,V_ALLOWABLE_STRESS_PSI
+    		,V_YIELD_STRENGTH_KSI
+    		,V_TENSILE_STREGTH_KSI
+            	
+    FROM "PipeMaster" WHERE "EquipmentNo" = UPPER(TRIM(I_EQUIPMENT_NO));
+    ------ End Get Pipe Master Details  -----
+
+    ------ Start Get Inspection Confidence Details  -----
+
+     SELECT "VeryHigh"
+          ,"High"
+          ,"Medium"
+          ,"Low"
+          ,"Found"
+    	  ,"EffectiveCR"
+    	  ,'N'
+    	  ,"UseMeasuredLCR"
+    	  ,"UseMeasuredSCR"
+    	  ,"TheoriticalCR"
+    	  ,"MeasuredLCR"
+    	  ,"MeasuredSCR"
+    	  ,"EffectiveAge"
+    	  INTO
+    	  V_VERY_HIGH, V_HIGH, V_MEDIUM, V_LOW, V_NO
+    	  ,V_EFFECTIVE_CORROSION_RATE
+    	  ,V_INJECTION_POINTS_INTERMITENT
+    	  ,V_USE_LICR 
+    	  ,V_USE_SICR 
+          ,V_THEORETICAL_CORROSION_RATE_TICR 
+          ,V_MEASURED_LONGTERM_CORROSION_RATE_LICR 
+          ,V_MEASURED_SHORTTERM_CORROSION_RATE_SICR 
+    	  ,V_EFFECTIVE_AGE	
+    FROM "POF_EC"  WHERE "EquipmentNo" = UPPER(TRIM(I_EQUIPMENT_NO));  
+    ------ End Get Inspection Confidence Details  -----
+
+    ------ Start Get PRP Details  -----
+    --Begin try
+    SELECT "PRP_1"
+          ,"PRP_2"
+          ,"PRP_3"
+    INTO
+     V_PRP_1
+    ,V_PRP_2
+    ,V_PRP_3
+    FROM "TBL_PRP" WHERE "PRP_CONFIDENCE" = 'LOW';  --V_PRP_CONFIDENCE;
+    --end try
+    --begin catch
+    --			INSERT INTO ERROR_LOG (ErrorMessage,CodeLineNo,SqlName) VALUES(ERROR_MESSAGE(),ERROR_LINE(),ERROR_PROCEDURE());	
+    --end catch
+    ------ End Get PRP Details  -----
+
+    ------ Start Get Conditional Probability Details  -----
+    --Begin try
+    SELECT "A"
+          ,"B"
+          ,"C"
+          ,"D"
+          ,"E"
+    INTO
+    V_CONDITIONAL_PROBABILITY_1_A
+    ,V_CONDITIONAL_PROBABILITY_1_B
+    ,V_CONDITIONAL_PROBABILITY_1_C
+    ,V_CONDITIONAL_PROBABILITY_1_D
+    ,V_CONDITIONAL_PROBABILITY_1_E
+    FROM "TBL_COP" WHERE "COP_LEVEL" = 1;
+
+    SELECT "A"
+          ,"B"
+          ,"C"
+          ,"D"
+          ,"E"
+    INTO
+     V_CONDITIONAL_PROBABILITY_2_A
+    ,V_CONDITIONAL_PROBABILITY_2_B
+    ,V_CONDITIONAL_PROBABILITY_2_C
+    ,V_CONDITIONAL_PROBABILITY_2_D
+    ,V_CONDITIONAL_PROBABILITY_2_E
+    FROM "TBL_COP" WHERE "COP_LEVEL" = 2;
+
+    SELECT "A"
+          ,"B"
+          ,"C"
+          ,"D"
+          ,"E"
+    INTO
+     V_CONDITIONAL_PROBABILITY_3_A
+    ,V_CONDITIONAL_PROBABILITY_3_B
+    ,V_CONDITIONAL_PROBABILITY_3_C
+    ,V_CONDITIONAL_PROBABILITY_3_D
+    ,V_CONDITIONAL_PROBABILITY_3_E
+    FROM "TBL_COP" WHERE "COP_LEVEL" = 3;
+    --end try
+    --begin catch
+    --			INSERT INTO ERROR_LOG (ErrorMessage,CodeLineNo,SqlName) VALUES(ERROR_MESSAGE(),ERROR_LINE(),ERROR_PROCEDURE());	
+    --end catch
+    ------ End Get Conditional Probability Details  -----
+
+    --Begin try
+    ------ Start Get Calculations Details  -----
+    --V_EFFECTIVE_AGE := I_PRESENT_YEAR - V_LAST_MEASURED_YEAR_FOR_DIA_LMY;
+    V_EFFECTIVE_THK := V_LAST_MEASURED_THK_FOR_DIA_LMT;
+    --V_EFFECTIVE_AGE := I_PRESENT_YEAR - V_YEAR_IN_SERVICE;
+    --V_EFFECTIVE_THK := V_NOM_THK_NT_INCHES;
+    RAISE INFO 'V_OPTION_FOR_MIN_REQ_THK %', V_OPTION_FOR_MIN_REQ_THK;
+    IF (V_OPTION_FOR_MIN_REQ_THK = 'PrThk') THEN
+
+    	V_MIN_REQ_THK := (V_DESIGN_PRESSURE_P_PSI * (V_NOM_DIA_D_INCHES / 2) / ((V_ALLOWABLE_STRESS_PSI * I_EFFICIENCY_OF_WELD_E) - (0.6 * V_DESIGN_PRESSURE_P_PSI)));
+
+    ELSIF (V_OPTION_FOR_MIN_REQ_THK = 'NomThk-CA') THEN
+
+    	V_MIN_REQ_THK := V_NOM_THK_NT_INCHES - V_CORROSION_ALLOWANCE;
+
+    ELSIF(V_OPTION_FOR_MIN_REQ_THK = 'STRUCTURAL_MIN_THK') THEN
+
+    	V_MIN_REQ_THK := V_STRUCTURAL_MIN_THK;
+
+    END IF;
+    IF (V_INJECTION_POINTS_INTERMITENT = 'Y') THEN
+
+    	V_EFFECTIVE_CORR_RATE := V_EFFECTIVE_CORROSION_RATE * 2;
+
+    ELSE
+
+    	V_EFFECTIVE_CORR_RATE := V_EFFECTIVE_CORROSION_RATE;
+
+    END IF;
+    V_ART := (V_EFFECTIVE_CORR_RATE * (V_EFFECTIVE_AGE / V_EFFECTIVE_THK));
+    V_FLOW_STRESS := (((V_YIELD_STRENGTH_KSI + V_TENSILE_STREGTH_KSI) / 2) * 1.1 * I_EFFICIENCY_OF_WELD_E);
+    V_STENGTH_RATIO := (((V_ALLOWABLE_STRESS_PSI /1000) * I_EFFICIENCY_OF_WELD_E * V_MIN_REQ_THK )/(V_FLOW_STRESS * V_EFFECTIVE_THK));
+    ------ End Get Calculations Details  -----
+
+    ------ Start Get Inspection Effectiveness Factor Details  -----
+    V_INSPECTION_EFFECTIVENESS_1 := (V_PRP_1 *(POWER(V_CONDITIONAL_PROBABILITY_1_A ,V_VERY_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_1_B,V_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_1_C,V_MEDIUM )*POWER(V_CONDITIONAL_PROBABILITY_1_D,V_LOW )));
+    V_INSPECTION_EFFECTIVENESS_2 := (V_PRP_2 *(POWER(V_CONDITIONAL_PROBABILITY_2_A ,V_VERY_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_2_B,V_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_2_C,V_MEDIUM )*POWER(V_CONDITIONAL_PROBABILITY_2_D,V_LOW )));
+    V_INSPECTION_EFFECTIVENESS_3 := (V_PRP_3 *(POWER(V_CONDITIONAL_PROBABILITY_3_A ,V_VERY_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_3_B,V_HIGH )*POWER(V_CONDITIONAL_PROBABILITY_3_C,V_MEDIUM )*POWER(V_CONDITIONAL_PROBABILITY_3_D,V_LOW )));
+    ------ End Get Inspection Effectiveness Factor Details  -----
+
+    ------ Start Get Calculation of Posterior Probability Details  -----
+    V_POSTERIOR_PROBABILITY_1 := (V_INSPECTION_EFFECTIVENESS_1 / (V_INSPECTION_EFFECTIVENESS_1 + V_INSPECTION_EFFECTIVENESS_2 + V_INSPECTION_EFFECTIVENESS_3));
+    V_POSTERIOR_PROBABILITY_2 := (V_INSPECTION_EFFECTIVENESS_2 / (V_INSPECTION_EFFECTIVENESS_1 + V_INSPECTION_EFFECTIVENESS_2 + V_INSPECTION_EFFECTIVENESS_3));
+    V_POSTERIOR_PROBABILITY_3 := (V_INSPECTION_EFFECTIVENESS_3 / (V_INSPECTION_EFFECTIVENESS_1 + V_INSPECTION_EFFECTIVENESS_2 + V_INSPECTION_EFFECTIVENESS_3));
+    ------ End Get Calculation of Posterior Probability Details  -----
+
+    ------ Start Get Calculation of Beta 1,2,3 Details  -----
+    V_CAL_OF_BETA_COVT := 0.2;
+    V_CAL_OF_BETA_COVSF := 0.2;
+    V_CAL_OF_BETA_COVP := 0.05;
+    V_CAL_OF_BETA_CONST_1 := 1;
+    V_CAL_OF_BETA_CONST_2 := 2;
+    V_CAL_OF_BETA_CONST_3 := 4;
+    V_CAL_OF_BETA_1 := ((POWER(V_CAL_OF_BETA_CONST_1 ,2) * POWER(V_ART ,2) * POWER(V_CAL_OF_BETA_COVT ,2))+(POWER(1-(V_CAL_OF_BETA_CONST_1 * V_ART ),2))*(POWER(V_CAL_OF_BETA_COVSF ,2))+(POWER(V_STENGTH_RATIO ,2)*POWER(V_CAL_OF_BETA_COVP ,2)));
+    V_CAL_OF_BETA_2 := ((POWER(V_CAL_OF_BETA_CONST_2 ,2) * POWER(V_ART ,2) * POWER(V_CAL_OF_BETA_COVT ,2))+(POWER(1-(V_CAL_OF_BETA_CONST_2 * V_ART ),2))*(POWER(V_CAL_OF_BETA_COVSF ,2))+(POWER(V_STENGTH_RATIO ,2)*POWER(V_CAL_OF_BETA_COVP ,2)));
+    V_CAL_OF_BETA_3 := ((POWER(V_CAL_OF_BETA_CONST_3 ,2) * POWER(V_ART ,2) * POWER(V_CAL_OF_BETA_COVT ,2))+(POWER(1-(V_CAL_OF_BETA_CONST_3 * V_ART ),2))*(POWER(V_CAL_OF_BETA_COVSF ,2))+(POWER(V_STENGTH_RATIO ,2)*POWER(V_CAL_OF_BETA_COVP ,2)));
+    V_CAL_OF_BETA_DS_VALUES_1 := ((1 - ( V_CAL_OF_BETA_CONST_1 * V_ART ) - V_STENGTH_RATIO )/SQRT(V_CAL_OF_BETA_1));
+    V_CAL_OF_BETA_DS_VALUES_2 := ((1 - ( V_CAL_OF_BETA_CONST_2 * V_ART ) - V_STENGTH_RATIO )/SQRT(V_CAL_OF_BETA_2));
+    V_CAL_OF_BETA_DS_VALUES_3 := ((1 - ( V_CAL_OF_BETA_CONST_3 * V_ART ) - V_STENGTH_RATIO )/SQRT(V_CAL_OF_BETA_3));
+    ------ End Get Calculation of Beta 1,2,3 Details  -----
+
+    ------ Start Get Calculation of Base Damage Factor & POF Details  -----
+    V_DAMAGE_FACTOR := (((((V_POSTERIOR_PROBABILITY_1 ) * udf_NORMSDIST(-(V_CAL_OF_BETA_DS_VALUES_1))) + ((V_POSTERIOR_PROBABILITY_2) * udf_NORMSDIST(-(V_CAL_OF_BETA_DS_VALUES_2)))+((V_POSTERIOR_PROBABILITY_3) * udf_NORMSDIST(-(V_CAL_OF_BETA_DS_VALUES_3))))/((0.000156))));
+
+    V_POF_EXPO := ((3.06* (0.00001)) * V_DAMAGE_FACTOR);
+    V_POF := abs(log(V_POF_EXPO));
+    V_AVAILABLE_THK := V_EFFECTIVE_THK - V_MIN_REQ_THK; 
+    V_REMAINING_LIFE := V_AVAILABLE_THK / V_EFFECTIVE_CORR_RATE;
+    V_HALF_LIFE := V_REMAINING_LIFE / 2;
+    -- SET V_POF_HALF_LIFE 
+    -- SET V_OVERALL_POF
+    ------ End Get Calculation of Base Damage Factor & POF Details  -----
+    --end try
+    --begin catch
+    --			INSERT INTO ERROR_LOG (ErrorMessage,CodeLineNo,SqlName) VALUES(ERROR_MESSAGE(),ERROR_LINE(),ERROR_PROCEDURE());	
+    --end catch
+
+    -- Update POF_IC details  --
+    UPDATE "POF_EC" SET "POF" = ROUND(V_POF::NUMERIC, 5), "DamageFactor"=ROUND(V_DAMAGE_FACTOR::NUMERIC, 5), "Art"=ROUND(V_ART::NUMERIC, 5), "StrengthRatio" = ROUND(V_STENGTH_RATIO::NUMERIC, 5) WHERE "EquipmentNo"=I_EQUIPMENT_NO;
+    IF EXISTS (SELECT 1 FROM "TBL_POF_EC" WHERE "EQUIPMENT_NO" = I_EQUIPMENT_NO AND "PRESENT_YEAR" = cast(I_PRESENT_YEAR AS VARCHAR)) THEN
+     UPDATE "TBL_POF_EC" SET	 	"YEAR_IN_SERVICE"						=	cast(V_YEAR_IN_SERVICE AS VARCHAR)
+    						,"NOM_DIA_D_INCHES"					=	cast(V_NOM_DIA_D_INCHES AS VARCHAR)
+    						,"NOM_THK_NT_INCHES"					=	cast(V_NOM_THK_NT_INCHES AS VARCHAR)
+    						,"DESIGN_TEMP_DEGF"					=	cast(V_DESIGN_TEMP_DEGF AS VARCHAR)
+    						,"DESIGN_PRESSURE_P_PSI"				=	cast(V_DESIGN_PRESSURE_P_PSI AS VARCHAR)
+    						,"EFFECTIVE_CORROSION_RATE"			=	cast(V_EFFECTIVE_CORROSION_RATE AS VARCHAR)
+    						,"MATERIAL_STD"						=	cast(V_MATERIAL_STD AS VARCHAR)
+    						,"MATERIAL_GRADE"						=	cast(V_MATERIAL_GRADE AS VARCHAR)
+    						,"INJECTION_POINTS_INTERMITENT"		=	cast(V_INJECTION_POINTS_INTERMITENT AS VARCHAR)
+    						,"CORROSION_ALLOWANCE"				=	cast(V_CORROSION_ALLOWANCE AS VARCHAR)
+    						,"VERY_HIGH"						=	cast(V_VERY_HIGH AS VARCHAR)
+    						,"HIGH"								=	cast(V_HIGH AS VARCHAR)
+    						,"MEDIUM"							=	cast(V_MEDIUM AS VARCHAR)
+    						,"LOW"								=	cast(V_LOW AS VARCHAR)
+    						,"NO"								=	cast(V_NO AS VARCHAR)
+    						,"LAST_MEASURED_THK_FOR_DIA_LMT"		=	cast(V_LAST_MEASURED_THK_FOR_DIA_LMT AS VARCHAR)
+    						,"LAST_MEASURED_YEAR_FOR_DIA_LMY"		=	cast(V_LAST_MEASURED_YEAR_FOR_DIA_LMY AS VARCHAR)
+    						,"YIELD_STRENGTH_KSI"					=	cast(V_YIELD_STRENGTH_KSI AS VARCHAR)
+    						,"TENSILE_STREGTH_KSI"				=	cast(V_TENSILE_STREGTH_KSI AS VARCHAR)
+    						
+    						,"EFFICIENCY_OF_WELD_E"				=	cast(I_EFFICIENCY_OF_WELD_E AS VARCHAR) 
+    						,"YOUNGS_MODULUS_Y"					=	cast(I_YOUNGS_MODULUS_Y AS VARCHAR)     
+    						,"ALLOWABLE_STRESS_PSI"				=	cast(V_ALLOWABLE_STRESS_PSI AS VARCHAR)
+    						,"PRP_1"								=	cast(V_PRP_1 AS VARCHAR)
+    						,"PRP_2"								=	cast(V_PRP_2 AS VARCHAR)
+    						,"PRP_3"								=	cast(V_PRP_3 AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_1_A"		=	cast(V_CONDITIONAL_PROBABILITY_1_A AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_1_B"		=	cast(V_CONDITIONAL_PROBABILITY_1_B AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_1_C"		=	cast(V_CONDITIONAL_PROBABILITY_1_C AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_1_D"		=	cast(V_CONDITIONAL_PROBABILITY_1_D AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_1_E"		=	cast(V_CONDITIONAL_PROBABILITY_1_E AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_2_A"		=	cast(V_CONDITIONAL_PROBABILITY_2_A AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_2_B"		=	cast(V_CONDITIONAL_PROBABILITY_2_B AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_2_C"		=	cast(V_CONDITIONAL_PROBABILITY_2_C AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_2_D"		=	cast(V_CONDITIONAL_PROBABILITY_2_D AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_2_E"		=	cast(V_CONDITIONAL_PROBABILITY_2_E AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_3_A"		=	cast(V_CONDITIONAL_PROBABILITY_3_A AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_3_B"		=	cast(V_CONDITIONAL_PROBABILITY_3_B AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_3_C"		=	cast(V_CONDITIONAL_PROBABILITY_3_C AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_3_D"		=	cast(V_CONDITIONAL_PROBABILITY_3_D AS VARCHAR)
+    						,"CONDITIONAL_PROBABILITY_3_E"		=	cast(V_CONDITIONAL_PROBABILITY_3_E AS VARCHAR)
+    						,"EFFECTIVE_THK"						=	cast(V_EFFECTIVE_THK AS VARCHAR)						
+    						,"EFFECTIVE_AGE"						=	cast(V_EFFECTIVE_AGE AS VARCHAR)						
+    						,"MIN_REQ_THK"						=	cast(V_MIN_REQ_THK AS VARCHAR)						
+    						,"EFFECTIVE_CORR_RATE"				=	cast(V_EFFECTIVE_CORR_RATE AS VARCHAR)				
+    						,"ART"								=	cast(V_ART AS VARCHAR)								
+    						,"FLOW_STRESS"						=	cast(V_FLOW_STRESS AS VARCHAR)					
+    						,"STENGTH_RATIO"						=	cast(V_STENGTH_RATIO AS VARCHAR)						
+    						,"INSPECTION_EFFECTIVENESS_1"			=	cast(V_INSPECTION_EFFECTIVENESS_1 AS VARCHAR)			
+    						,"INSPECTION_EFFECTIVENESS_2"			=	cast(V_INSPECTION_EFFECTIVENESS_2 AS VARCHAR)			
+    						,"INSPECTION_EFFECTIVENESS_3"			=	cast(V_INSPECTION_EFFECTIVENESS_3 AS VARCHAR)			
+    						,"POSTERIOR_PROBABILITY_1"			=	cast(V_POSTERIOR_PROBABILITY_1 AS VARCHAR)			
+    						,"POSTERIOR_PROBABILITY_2"			=	cast(V_POSTERIOR_PROBABILITY_2 AS VARCHAR)			
+    						,"POSTERIOR_PROBABILITY_3"			=	cast(V_POSTERIOR_PROBABILITY_3 AS VARCHAR)			
+    						,"CAL_OF_BETA_COVT"					=	cast(V_CAL_OF_BETA_COVT AS VARCHAR)					
+    						,"CAL_OF_BETA_COVSF"					=	cast(V_CAL_OF_BETA_COVSF AS VARCHAR)					
+    						,"CAL_OF_BETA_COVP"					=	cast(V_CAL_OF_BETA_COVP AS VARCHAR)					
+    						,"CAL_OF_BETA_CONST_1"				=	cast(V_CAL_OF_BETA_CONST_1 AS VARCHAR)				
+    						,"CAL_OF_BETA_CONST_2"				=	cast(V_CAL_OF_BETA_CONST_2 AS VARCHAR)				
+    						,"CAL_OF_BETA_CONST_3"				=	cast(V_CAL_OF_BETA_CONST_3 AS VARCHAR)				
+    						,"CAL_OF_BETA_1"						=	cast(V_CAL_OF_BETA_1 AS VARCHAR)						
+    						,"CAL_OF_BETA_2"						=	cast(V_CAL_OF_BETA_2 AS VARCHAR)						
+    						,"CAL_OF_BETA_3"						=	cast(V_CAL_OF_BETA_3 AS VARCHAR)						
+    						,"CAL_OF_BETA_DS_VALUES_1"			=	cast(V_CAL_OF_BETA_DS_VALUES_1 AS VARCHAR)			
+    						,"CAL_OF_BETA_DS_VALUES_2"			=	cast(V_CAL_OF_BETA_DS_VALUES_2 AS VARCHAR)			
+    						,"CAL_OF_BETA_DS_VALUES_3"			=	cast(V_CAL_OF_BETA_DS_VALUES_3 AS VARCHAR)			
+    						,"DAMAGE_FACTOR"						=	cast(ROUND(V_DAMAGE_FACTOR::NUMERIC, 5) AS VARCHAR)						
+    						,"POF"								=	cast(ROUND(V_POF::NUMERIC) AS VARCHAR)								
+    						,"POF_EXPO"							=	cast(ROUND(V_POF_EXPO::NUMERIC, 5) AS VARCHAR)							
+    						,"AVAILABLE_THK"						=	cast(V_AVAILABLE_THK AS VARCHAR)						
+    						,"REMAINING_LIFE"						=	cast(V_REMAINING_LIFE AS VARCHAR)						
+    						,"HALF_LIFE"							=	cast(V_HALF_LIFE AS VARCHAR)						
+    						,"POF_HALF_LIFE"						=	cast(V_POF_HALF_LIFE AS VARCHAR)						
+    						,"OVERALL_POF"						=	cast(V_OVERALL_POF  AS VARCHAR)		
+    						,"USE_LICR"                         =   V_USE_LICR
+    ,"USE_SICR"                                                 =   V_USE_SICR
+    ,"THEORETICAL_CORROSION_RATE_TICR"                              = cast(V_THEORETICAL_CORROSION_RATE_TICR  AS VARCHAR)
+    ,"MEASURED_LONGTERM_CORROSION_RATE_LICR"                    = cast(V_MEASURED_LONGTERM_CORROSION_RATE_LICR   AS VARCHAR)
+    ,"MEASURED_SHORTTERM_CORROSION_RATE_SICR"                    = cast(V_MEASURED_SHORTTERM_CORROSION_RATE_SICR   AS VARCHAR)
+    						,"ModifiedDate"                     = NOW()
+    						,"ModifiedBy"                     = 'SYSADMIN'
+    WHERE "EQUIPMENT_NO" = I_EQUIPMENT_NO AND "PRESENT_YEAR" = cast(I_PRESENT_YEAR AS VARCHAR); 
+    ELSE
+    INSERT INTO "TBL_POF_EC" (	
+    "EQUIPMENT_NO"
+    ,"PRESENT_YEAR"
+    ,"CORROSION_TYPE"
+    ,"YEAR_IN_SERVICE"								
+    ,"NOM_DIA_D_INCHES"								
+    ,"NOM_THK_NT_INCHES"							
+    ,"DESIGN_TEMP_DEGF"								
+    ,"DESIGN_PRESSURE_P_PSI"						
+    ,"EFFECTIVE_CORROSION_RATE"						
+    ,"MATERIAL_STD"									
+    ,"MATERIAL_GRADE"								
+    ,"INJECTION_POINTS_INTERMITENT"					
+    ,"CORROSION_ALLOWANCE"							
+    ,"VERY_HIGH"									
+    ,"HIGH"											
+    ,"MEDIUM"										
+    ,"LOW"											
+    ,"NO"											
+    ,"LAST_MEASURED_THK_FOR_DIA_LMT"				
+    ,"LAST_MEASURED_YEAR_FOR_DIA_LMY"				
+    ,"YIELD_STRENGTH_KSI"							
+    ,"TENSILE_STREGTH_KSI"									
+    ,"EFFICIENCY_OF_WELD_E"							
+    ,"YOUNGS_MODULUS_Y"								
+    ,"ALLOWABLE_STRESS_PSI"							
+    ,"PRP_1"										
+    ,"PRP_2"										
+    ,"PRP_3"										
+    ,"CONDITIONAL_PROBABILITY_1_A"					
+    ,"CONDITIONAL_PROBABILITY_1_B"					
+    ,"CONDITIONAL_PROBABILITY_1_C"					
+    ,"CONDITIONAL_PROBABILITY_1_D"					
+    ,"CONDITIONAL_PROBABILITY_1_E"			        
+    ,"CONDITIONAL_PROBABILITY_2_A"			        
+    ,"CONDITIONAL_PROBABILITY_2_B"			        
+    ,"CONDITIONAL_PROBABILITY_2_C"			        
+    ,"CONDITIONAL_PROBABILITY_2_D"			        
+    ,"CONDITIONAL_PROBABILITY_2_E"			        
+    ,"CONDITIONAL_PROBABILITY_3_A"			        
+    ,"CONDITIONAL_PROBABILITY_3_B"			        
+    ,"CONDITIONAL_PROBABILITY_3_C"			        
+    ,"CONDITIONAL_PROBABILITY_3_D"			        
+    ,"CONDITIONAL_PROBABILITY_3_E"			        
+    ,"EFFECTIVE_THK"						        	
+    ,"EFFECTIVE_AGE"						        	
+    ,"MIN_REQ_THK"							        
+    ,"EFFECTIVE_CORR_RATE"					        
+    ,"ART"									        
+    ,"FLOW_STRESS"							        
+    ,"STENGTH_RATIO"						        	
+    ,"INSPECTION_EFFECTIVENESS_1"			        	
+    ,"INSPECTION_EFFECTIVENESS_2"			        	
+    ,"INSPECTION_EFFECTIVENESS_3"			        	
+    ,"POSTERIOR_PROBABILITY_1"				        
+    ,"POSTERIOR_PROBABILITY_2"				        
+    ,"POSTERIOR_PROBABILITY_3"				        
+    ,"CAL_OF_BETA_COVT"						        
+    ,"CAL_OF_BETA_COVSF"					        	
+    ,"CAL_OF_BETA_COVP"						        
+    ,"CAL_OF_BETA_CONST_1"					        
+    ,"CAL_OF_BETA_CONST_2"					        
+    ,"CAL_OF_BETA_CONST_3"					        
+    ,"CAL_OF_BETA_1"						        	
+    ,"CAL_OF_BETA_2"						        	
+    ,"CAL_OF_BETA_3"						        	
+    ,"CAL_OF_BETA_DS_VALUES_1"				        
+    ,"CAL_OF_BETA_DS_VALUES_2"				        
+    ,"CAL_OF_BETA_DS_VALUES_3"				        
+    ,"DAMAGE_FACTOR"	        
+    ,"POF_EXPO"	
+    ,"POF"							        
+    ,"AVAILABLE_THK"						        	
+    ,"REMAINING_LIFE"						        	
+    ,"HALF_LIFE"							        
+    ,"POF_HALF_LIFE"						        	
+    ,"OVERALL_POF"	
+    ,"USE_LICR" 
+    ,"USE_SICR" 
+    ,"THEORETICAL_CORROSION_RATE_TICR" 
+    ,"MEASURED_LONGTERM_CORROSION_RATE_LICR"
+    ,"MEASURED_SHORTTERM_CORROSION_RATE_SICR" 	
+    ,"CreatedDate"                     	        
+    ,"CreatedBy" 	
+    )
+    VALUES(
+    I_EQUIPMENT_NO
+    ,cast(I_PRESENT_YEAR AS VARCHAR)
+    ,'EC'
+    ,cast(V_YEAR_IN_SERVICE AS VARCHAR)						
+    ,cast(V_NOM_DIA_D_INCHES AS VARCHAR)
+    ,cast(V_NOM_THK_NT_INCHES AS VARCHAR)
+    ,cast(V_DESIGN_TEMP_DEGF AS VARCHAR)
+    ,cast(V_DESIGN_PRESSURE_P_PSI AS VARCHAR)
+    ,cast(V_EFFECTIVE_CORROSION_RATE AS VARCHAR)
+    ,cast(V_MATERIAL_STD AS VARCHAR)
+    ,cast(V_MATERIAL_GRADE AS VARCHAR)
+    ,cast(V_INJECTION_POINTS_INTERMITENT AS VARCHAR)
+    ,cast(V_CORROSION_ALLOWANCE AS VARCHAR)
+    ,cast(V_VERY_HIGH AS VARCHAR)
+    ,cast(V_HIGH AS VARCHAR)
+    ,cast(V_MEDIUM AS VARCHAR)
+    ,cast(V_LOW AS VARCHAR)
+    ,cast(V_NO AS VARCHAR)
+    ,cast(V_LAST_MEASURED_THK_FOR_DIA_LMT AS VARCHAR)
+    ,cast(V_LAST_MEASURED_YEAR_FOR_DIA_LMY AS VARCHAR)
+    ,cast(V_YIELD_STRENGTH_KSI AS VARCHAR)
+    ,cast(V_TENSILE_STREGTH_KSI AS VARCHAR)				
+    ,cast(I_EFFICIENCY_OF_WELD_E AS VARCHAR) 
+    ,cast(I_YOUNGS_MODULUS_Y AS VARCHAR)     
+    ,cast(V_ALLOWABLE_STRESS_PSI AS VARCHAR)
+    ,cast(V_PRP_1 AS VARCHAR)
+    ,cast(V_PRP_2 AS VARCHAR)
+    ,cast(V_PRP_3 AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_1_A AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_1_B AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_1_C AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_1_D AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_1_E AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_2_A AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_2_B AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_2_C AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_2_D AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_2_E AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_3_A AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_3_B AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_3_C AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_3_D AS VARCHAR)
+    ,cast(V_CONDITIONAL_PROBABILITY_3_E AS VARCHAR)
+    ,cast(V_EFFECTIVE_THK AS VARCHAR)					
+    ,cast(V_EFFECTIVE_AGE AS VARCHAR)					
+    ,cast(V_MIN_REQ_THK AS VARCHAR)						
+    ,cast(V_EFFECTIVE_CORR_RATE AS VARCHAR)				
+    ,cast(V_ART AS VARCHAR)								
+    ,cast(V_FLOW_STRESS AS VARCHAR)					
+    ,cast(V_STENGTH_RATIO AS VARCHAR)					
+    ,cast(V_INSPECTION_EFFECTIVENESS_1 AS VARCHAR)		
+    ,cast(V_INSPECTION_EFFECTIVENESS_2 AS VARCHAR)		
+    ,cast(V_INSPECTION_EFFECTIVENESS_3 AS VARCHAR)		
+    ,cast(V_POSTERIOR_PROBABILITY_1 AS VARCHAR)			
+    ,cast(V_POSTERIOR_PROBABILITY_2 AS VARCHAR)			
+    ,cast(V_POSTERIOR_PROBABILITY_3 AS VARCHAR)			
+    ,cast(V_CAL_OF_BETA_COVT AS VARCHAR)					
+    ,cast(V_CAL_OF_BETA_COVSF AS VARCHAR)				
+    ,cast(V_CAL_OF_BETA_COVP AS VARCHAR)					
+    ,cast(V_CAL_OF_BETA_CONST_1 AS VARCHAR)				
+    ,cast(V_CAL_OF_BETA_CONST_2 AS VARCHAR)				
+    ,cast(V_CAL_OF_BETA_CONST_3 AS VARCHAR)				
+    ,cast(V_CAL_OF_BETA_1 AS VARCHAR)					
+    ,cast(V_CAL_OF_BETA_2 AS VARCHAR)					
+    ,cast(V_CAL_OF_BETA_3 AS VARCHAR)					
+    ,cast(V_CAL_OF_BETA_DS_VALUES_1 AS VARCHAR)			
+    ,cast(V_CAL_OF_BETA_DS_VALUES_2 AS VARCHAR)			
+    ,cast(V_CAL_OF_BETA_DS_VALUES_3 AS VARCHAR)			
+    ,cast(V_DAMAGE_FACTOR AS VARCHAR)					
+    ,cast(ROUND(V_POF_EXPO::NUMERIC, 5) AS VARCHAR)								
+    ,cast(ROUND(V_POF::NUMERIC) AS VARCHAR)								
+    ,cast(V_AVAILABLE_THK AS VARCHAR)					
+    ,cast(V_REMAINING_LIFE AS VARCHAR)					
+    ,cast(V_HALF_LIFE AS VARCHAR)						
+    ,cast(V_POF_HALF_LIFE AS VARCHAR)					
+    ,cast(V_OVERALL_POF  AS VARCHAR)
+    ,V_USE_LICR 
+    ,V_USE_SICR 
+    ,cast(ROUND(V_THEORETICAL_CORROSION_RATE_TICR::NUMERIC, 5)   AS VARCHAR)  
+    ,cast(ROUND(V_MEASURED_LONGTERM_CORROSION_RATE_LICR::NUMERIC, 5)   AS VARCHAR)
+    ,cast(ROUND(V_MEASURED_SHORTTERM_CORROSION_RATE_SICR::NUMERIC, 5)   AS VARCHAR)
+    ,NOW()
+    ,'SYSADMIN'
+    );
+
+    END IF;
+    END;
+    $BODY$ ;
+
+    --CALL sp_upd_pof_ec ('P01.AL1001',2020);
+
+   INSERT INTO "TBL_POF_IC" (	
+"EQUIPMENT_NO"
+,"PRESENT_YEAR"
+,"CORROSION_TYPE"
+,"YEAR_IN_SERVICE"								
+,"NOM_DIA_D_INCHES"								
+,"NOM_THK_NT_INCHES"							
+,"DESIGN_TEMP_DEGF"								
+,"DESIGN_PRESSURE_P_PSI"						
+,"EFFECTIVE_CORROSION_RATE"						
+,"MATERIAL_STD"									
+,"MATERIAL_GRADE"								
+,"INJECTION_POINTS_INTERMITENT"					
+,"CORROSION_ALLOWANCE"							
+,"VERY_HIGH"									
+,"HIGH"											
+,"MEDIUM"										
+,"LOW"											
+,"NO"											
+,"LAST_MEASURED_THK_FOR_DIA_LMT"				
+,"LAST_MEASURED_YEAR_FOR_DIA_LMY"				
+,"YIELD_STRENGTH_KSI"							
+,"TENSILE_STREGTH_KSI"									
+,"EFFICIENCY_OF_WELD_E"							
+,"YOUNGS_MODULUS_Y"								
+,"ALLOWABLE_STRESS_PSI"							
+,"PRP_1"										
+,"PRP_2"										
+,"PRP_3"										
+,"CONDITIONAL_PROBABILITY_1_A"					
+,"CONDITIONAL_PROBABILITY_1_B"					
+,"CONDITIONAL_PROBABILITY_1_C"					
+,"CONDITIONAL_PROBABILITY_1_D"					
+,"CONDITIONAL_PROBABILITY_1_E"			        
+,"CONDITIONAL_PROBABILITY_2_A"			        
+,"CONDITIONAL_PROBABILITY_2_B"			        
+,"CONDITIONAL_PROBABILITY_2_C"			        
+,"CONDITIONAL_PROBABILITY_2_D"			        
+,"CONDITIONAL_PROBABILITY_2_E"			        
+,"CONDITIONAL_PROBABILITY_3_A"			        
+,"CONDITIONAL_PROBABILITY_3_B"			        
+,"CONDITIONAL_PROBABILITY_3_C"			        
+,"CONDITIONAL_PROBABILITY_3_D"			        
+,"CONDITIONAL_PROBABILITY_3_E"			        
+,"EFFECTIVE_THK"						        	
+,"EFFECTIVE_AGE"						        	
+,"MIN_REQ_THK"							        
+,"EFFECTIVE_CORR_RATE"					        
+,"ART"									        
+,"FLOW_STRESS"							        
+,"STENGTH_RATIO"						        	
+,"INSPECTION_EFFECTIVENESS_1"			        	
+,"INSPECTION_EFFECTIVENESS_2"			        	
+,"INSPECTION_EFFECTIVENESS_3"			        	
+,"POSTERIOR_PROBABILITY_1"				        
+,"POSTERIOR_PROBABILITY_2"				        
+,"POSTERIOR_PROBABILITY_3"				        
+,"CAL_OF_BETA_COVT"						        
+,"CAL_OF_BETA_COVSF"					        	
+,"CAL_OF_BETA_COVP"						        
+,"CAL_OF_BETA_CONST_1"					        
+,"CAL_OF_BETA_CONST_2"					        
+,"CAL_OF_BETA_CONST_3"					        
+,"CAL_OF_BETA_1"						        	
+,"CAL_OF_BETA_2"						        	
+,"CAL_OF_BETA_3"						        	
+,"CAL_OF_BETA_DS_VALUES_1"				        
+,"CAL_OF_BETA_DS_VALUES_2"				        
+,"CAL_OF_BETA_DS_VALUES_3"				        
+,"DAMAGE_FACTOR"
+,"POF_EXPO"							        	
+,"POF"        
+,"AVAILABLE_THK"						        	
+,"REMAINING_LIFE"						        	
+,"HALF_LIFE"							        
+,"POF_HALF_LIFE"						        	
+,"OVERALL_POF"	
+,"USE_LICR" 
+,"USE_SICR" 
+,"THEORETICAL_CORROSION_RATE_TICR" 
+,"MEASURED_LONGTERM_CORROSION_RATE_LICR"
+,"MEASURED_SHORTTERM_CORROSION_RATE_SICR" 	
+,"CreatedDate"                     	        
+,"CreatedBy" 	
+)
+SELECT
+p."EquipmentNo"
+,cast(EXTRACT(YEAR FROM NOW())   AS VARCHAR)
+,'IC'
+,cast(p."YearInService"   AS VARCHAR)
+,cast(p."NominalDiameter"   AS VARCHAR)
+,cast(p."NominalThick"   AS VARCHAR)
+,cast(p."DesignTemperature"   AS VARCHAR)
+,cast(p."DesignPressure"   AS VARCHAR)
+,cast(c."EffectiveCR"   AS VARCHAR)
+,cast(p."MaterialStd"   AS VARCHAR)
+,cast(p."MaterialGrade"   AS VARCHAR)
+,cast(c."InjectionPoints"   AS VARCHAR)
+,cast(p."CorrosionAllowance"   AS VARCHAR)
+,cast(c."VeryHigh"   AS VARCHAR)
+,cast(c."High"   AS VARCHAR)
+,cast(c."Medium"   AS VARCHAR)
+,cast(c."Low"   AS VARCHAR)
+,cast(c."Found"   AS VARCHAR)
+,cast(p."LastMeasuredThick_LMT"   AS VARCHAR)
+,cast(p."LastMeasuredYear_LMY"   AS VARCHAR)
+,cast(p."YieldStrengthMPA_YS"   AS VARCHAR)
+,cast(p."TensileStrengthMPA_TS"   AS VARCHAR)
+,cast(p."JointEfficiency"   AS VARCHAR)
+,'1'
+,cast(p."AllowableStressMPA_S"   AS VARCHAR)
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,cast(p."EffectiveThk_ETHK"   AS VARCHAR)
+,cast(c."EffectiveAge"   AS VARCHAR)
+,cast(ROUND(p."EffectiveMinReqThk_EMRT",5)   AS VARCHAR)
+,cast(c."EffectiveCR"   AS VARCHAR)
+,cast(c."Art"   AS VARCHAR)
+,cast(c."FlowStress"   AS VARCHAR)
+,cast(c."StrengthRatio"   AS VARCHAR)
+,cast((0.5*(POWER(0.90,c."VeryHigh")*POWER(0.7,c."High")*POWER(0.5,c."Medium")*POWER(0.40,c."Low")))   AS VARCHAR)
+,cast((0.3*(POWER(0.09,c."VeryHigh")*POWER(0.2,c."High")*POWER(0.3,c."Medium")*POWER(0.33,c."Low")))   AS VARCHAR)
+,cast((0.2*(POWER(0.01,c."VeryHigh")*POWER(0.1,c."High")*POWER(0.2,c."Medium")*POWER(0.27,c."Low")))   AS VARCHAR)
+,cast((0.5*(POWER(0.90,c."VeryHigh")*POWER(0.7,c."High")*POWER(0.5,c."Medium")*POWER(0.40,c."Low"))) / ((0.5*(POWER(0.90,c."VeryHigh")*POWER(0.7,c."High")*POWER(0.5,c."Medium")*POWER(0.40,c."Low"))) + (0.3*(POWER(0.09,c."VeryHigh")*POWER(0.2,c."High")*POWER(0.3,c."Medium")*POWER(0.33,c."Low"))) + (0.2*(POWER(0.01,c."VeryHigh")*POWER(0.1,c."High")*POWER(0.2,c."Medium")*POWER(0.27,c."Low"))))   AS VARCHAR)
+,cast((0.3*(POWER(0.09,c."VeryHigh")*POWER(0.2,c."High")*POWER(0.3,c."Medium")*POWER(0.33,c."Low"))) / ((0.5*(POWER(0.90,c."VeryHigh")*POWER(0.7,c."High")*POWER(0.5,c."Medium")*POWER(0.40,c."Low"))) + (0.3*(POWER(0.09,c."VeryHigh")*POWER(0.2,c."High")*POWER(0.3,c."Medium")*POWER(0.33,c."Low"))) + (0.2*(POWER(0.01,c."VeryHigh")*POWER(0.1,c."High")*POWER(0.2,c."Medium")*POWER(0.27,c."Low"))))   AS VARCHAR)
+,cast((0.2*(POWER(0.01,c."VeryHigh")*POWER(0.1,c."High")*POWER(0.2,c."Medium")*POWER(0.27,c."Low"))) / ((0.5*(POWER(0.90,c."VeryHigh")*POWER(0.7,c."High")*POWER(0.5,c."Medium")*POWER(0.40,c."Low"))) + (0.3*(POWER(0.09,c."VeryHigh")*POWER(0.2,c."High")*POWER(0.3,c."Medium")*POWER(0.33,c."Low"))) + (0.2*(POWER(0.01,c."VeryHigh")*POWER(0.1,c."High")*POWER(0.2,c."Medium")*POWER(0.27,c."Low"))))   AS VARCHAR)
+,'0.2'
+,'0.2'
+,'0.05'
+,'1'
+,'2'
+,'4'
+,cast(((1-(1*c."Art")-c."StrengthRatio")/SQRT((POWER(1,2) * POWER(c."Art",2)*POWER(0.2,2))+(POWER(1-(1*c."Art"),2))*(POWER(0.2,2))+(POWER(c."StrengthRatio",2)*POWER(0.05,2))))   AS VARCHAR)
+,cast(((1-(2*c."Art")-c."StrengthRatio")/SQRT((POWER(2,2) * POWER(c."Art",2)*POWER(0.2,2))+(POWER(1-(2*c."Art"),2))*(POWER(0.2,2))+(POWER(c."StrengthRatio",2)*POWER(0.05,2))))   AS VARCHAR)
+,cast(((1-(4*c."Art")-c."StrengthRatio")/SQRT((POWER(4,2) * POWER(c."Art",2)*POWER(0.2,2))+(POWER(1-(4*c."Art"),2))*(POWER(0.2,2))+(POWER(c."StrengthRatio",2)*POWER(0.05,2))))   AS VARCHAR)
+,'0'
+,'0'
+,'0'
+,cast(c."DamageFactor"   AS VARCHAR)
+,cast(ROUND(((3.06* (0.00001)) * c."DamageFactor"),5) AS VARCHAR)
+,cast(c."POF"   AS VARCHAR)
+,cast(p."EffectiveThk_ETHK" - p."EffectiveMinReqThk_EMRT"   AS VARCHAR)
+,cast((p."EffectiveThk_ETHK" - p."EffectiveMinReqThk_EMRT") / c."EffectiveCR"   AS VARCHAR)
+,cast(((p."EffectiveThk_ETHK" - p."EffectiveMinReqThk_EMRT") / c."EffectiveCR")/2   AS VARCHAR)
+,'0'
+,cast(c."POF"   AS VARCHAR)
+,cast(c."UseMeasuredLCR"   AS VARCHAR)
+,cast(c."UseMeasuredSCR"   AS VARCHAR)
+,cast(c."TheoriticalCR"   AS VARCHAR)
+,cast(c."MeasuredLCR"   AS VARCHAR)
+,cast(c."MeasuredSCR"   AS VARCHAR)
+,NOW()
+,'SYSADMIN'
+FROM "PipeMaster" p
+INNER JOIN "POF_IC" c ON  c."PipeMasterID" = p."PipeMasterID";
+
+INSERT INTO "TBL_POF_EC" (	
+"EQUIPMENT_NO"
+,"PRESENT_YEAR"
+,"CORROSION_TYPE"
+,"YEAR_IN_SERVICE"								
+,"NOM_DIA_D_INCHES"								
+,"NOM_THK_NT_INCHES"							
+,"DESIGN_TEMP_DEGF"								
+,"DESIGN_PRESSURE_P_PSI"						
+,"EFFECTIVE_CORROSION_RATE"						
+,"MATERIAL_STD"									
+,"MATERIAL_GRADE"								
+,"INJECTION_POINTS_INTERMITENT"					
+,"CORROSION_ALLOWANCE"							
+,"VERY_HIGH"									
+,"HIGH"											
+,"MEDIUM"										
+,"LOW"											
+,"NO"											
+,"LAST_MEASURED_THK_FOR_DIA_LMT"				
+,"LAST_MEASURED_YEAR_FOR_DIA_LMY"				
+,"YIELD_STRENGTH_KSI"							
+,"TENSILE_STREGTH_KSI"									
+,"EFFICIENCY_OF_WELD_E"							
+,"YOUNGS_MODULUS_Y"								
+,"ALLOWABLE_STRESS_PSI"							
+,"PRP_1"										
+,"PRP_2"										
+,"PRP_3"										
+,"CONDITIONAL_PROBABILITY_1_A"					
+,"CONDITIONAL_PROBABILITY_1_B"					
+,"CONDITIONAL_PROBABILITY_1_C"					
+,"CONDITIONAL_PROBABILITY_1_D"					
+,"CONDITIONAL_PROBABILITY_1_E"			        
+,"CONDITIONAL_PROBABILITY_2_A"			        
+,"CONDITIONAL_PROBABILITY_2_B"			        
+,"CONDITIONAL_PROBABILITY_2_C"			        
+,"CONDITIONAL_PROBABILITY_2_D"			        
+,"CONDITIONAL_PROBABILITY_2_E"			        
+,"CONDITIONAL_PROBABILITY_3_A"			        
+,"CONDITIONAL_PROBABILITY_3_B"			        
+,"CONDITIONAL_PROBABILITY_3_C"			        
+,"CONDITIONAL_PROBABILITY_3_D"			        
+,"CONDITIONAL_PROBABILITY_3_E"			        
+,"EFFECTIVE_THK"						        	
+,"EFFECTIVE_AGE"						        	
+,"MIN_REQ_THK"							        
+,"EFFECTIVE_CORR_RATE"					        
+,"ART"									        
+,"FLOW_STRESS"							        
+,"STENGTH_RATIO"						        	
+,"INSPECTION_EFFECTIVENESS_1"			        	
+,"INSPECTION_EFFECTIVENESS_2"			        	
+,"INSPECTION_EFFECTIVENESS_3"			        	
+,"POSTERIOR_PROBABILITY_1"				        
+,"POSTERIOR_PROBABILITY_2"				        
+,"POSTERIOR_PROBABILITY_3"				        
+,"CAL_OF_BETA_COVT"						        
+,"CAL_OF_BETA_COVSF"					        	
+,"CAL_OF_BETA_COVP"						        
+,"CAL_OF_BETA_CONST_1"					        
+,"CAL_OF_BETA_CONST_2"					        
+,"CAL_OF_BETA_CONST_3"					        
+,"CAL_OF_BETA_1"						        	
+,"CAL_OF_BETA_2"						        	
+,"CAL_OF_BETA_3"						        	
+,"CAL_OF_BETA_DS_VALUES_1"				        
+,"CAL_OF_BETA_DS_VALUES_2"				        
+,"CAL_OF_BETA_DS_VALUES_3"				        
+,"DAMAGE_FACTOR"
+,"POF_EXPO"							        	
+,"POF"        
+,"AVAILABLE_THK"						        	
+,"REMAINING_LIFE"						        	
+,"HALF_LIFE"							        
+,"POF_HALF_LIFE"						        	
+,"OVERALL_POF"	
+,"USE_LICR" 
+,"USE_SICR" 
+,"THEORETICAL_CORROSION_RATE_TICR" 
+,"MEASURED_LONGTERM_CORROSION_RATE_LICR"
+,"MEASURED_SHORTTERM_CORROSION_RATE_SICR" 	
+,"CreatedDate"                     	        
+,"CreatedBy" 	
+)
+SELECT
+p."EquipmentNo"
+,cast(EXTRACT(YEAR FROM NOW())   AS VARCHAR)
+,'EC'
+,cast(p."YearInService"   AS VARCHAR)
+,cast(p."NominalDiameter"   AS VARCHAR)
+,cast(p."NominalThick"   AS VARCHAR)
+,cast(p."DesignTemperature"   AS VARCHAR)
+,cast(p."DesignPressure"   AS VARCHAR)
+,cast(c."EffectiveCR"   AS VARCHAR)
+,cast(p."MaterialStd"   AS VARCHAR)
+,cast(p."MaterialGrade"   AS VARCHAR)
+,'N'
+--,cast(c."InjectionPoints"   AS VARCHAR)
+,cast(p."CorrosionAllowance"   AS VARCHAR)
+,cast(c."VeryHigh"   AS VARCHAR)
+,cast(c."High"   AS VARCHAR)
+,cast(c."Medium"   AS VARCHAR)
+,cast(c."Low"   AS VARCHAR)
+,cast(c."Found"   AS VARCHAR)
+,cast(p."LastMeasuredThick_LMT"   AS VARCHAR)
+,cast(p."LastMeasuredYear_LMY"   AS VARCHAR)
+,cast(p."YieldStrengthMPA_YS"   AS VARCHAR)
+,cast(p."TensileStrengthMPA_TS"   AS VARCHAR)
+,cast(p."JointEfficiency"   AS VARCHAR)
+,'1'
+,cast(p."AllowableStressMPA_S"   AS VARCHAR)
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,'0'
+,cast(p."EffectiveThk_ETHK"   AS VARCHAR)
+,cast(c."EffectiveAge"   AS VARCHAR)
+,cast(ROUND(p."EffectiveMinReqThk_EMRT",5)   AS VARCHAR)
+,cast(c."EffectiveCR"   AS VARCHAR)
+,cast(c."Art"   AS VARCHAR)
+,cast(c."FlowStress"   AS VARCHAR)
+,cast(c."StrengthRatio"   AS VARCHAR)
+,cast((0.5*(POWER(0.90,c."VeryHigh")*POWER(0.7,c."High")*POWER(0.5,c."Medium")*POWER(0.40,c."Low")))   AS VARCHAR)
+,cast((0.3*(POWER(0.09,c."VeryHigh")*POWER(0.2,c."High")*POWER(0.3,c."Medium")*POWER(0.33,c."Low")))   AS VARCHAR)
+,cast((0.2*(POWER(0.01,c."VeryHigh")*POWER(0.1,c."High")*POWER(0.2,c."Medium")*POWER(0.27,c."Low")))   AS VARCHAR)
+,cast((0.5*(POWER(0.90,c."VeryHigh")*POWER(0.7,c."High")*POWER(0.5,c."Medium")*POWER(0.40,c."Low"))) / ((0.5*(POWER(0.90,c."VeryHigh")*POWER(0.7,c."High")*POWER(0.5,c."Medium")*POWER(0.40,c."Low"))) + (0.3*(POWER(0.09,c."VeryHigh")*POWER(0.2,c."High")*POWER(0.3,c."Medium")*POWER(0.33,c."Low"))) + (0.2*(POWER(0.01,c."VeryHigh")*POWER(0.1,c."High")*POWER(0.2,c."Medium")*POWER(0.27,c."Low"))))   AS VARCHAR)
+,cast((0.3*(POWER(0.09,c."VeryHigh")*POWER(0.2,c."High")*POWER(0.3,c."Medium")*POWER(0.33,c."Low"))) / ((0.5*(POWER(0.90,c."VeryHigh")*POWER(0.7,c."High")*POWER(0.5,c."Medium")*POWER(0.40,c."Low"))) + (0.3*(POWER(0.09,c."VeryHigh")*POWER(0.2,c."High")*POWER(0.3,c."Medium")*POWER(0.33,c."Low"))) + (0.2*(POWER(0.01,c."VeryHigh")*POWER(0.1,c."High")*POWER(0.2,c."Medium")*POWER(0.27,c."Low"))))   AS VARCHAR)
+,cast((0.2*(POWER(0.01,c."VeryHigh")*POWER(0.1,c."High")*POWER(0.2,c."Medium")*POWER(0.27,c."Low"))) / ((0.5*(POWER(0.90,c."VeryHigh")*POWER(0.7,c."High")*POWER(0.5,c."Medium")*POWER(0.40,c."Low"))) + (0.3*(POWER(0.09,c."VeryHigh")*POWER(0.2,c."High")*POWER(0.3,c."Medium")*POWER(0.33,c."Low"))) + (0.2*(POWER(0.01,c."VeryHigh")*POWER(0.1,c."High")*POWER(0.2,c."Medium")*POWER(0.27,c."Low"))))   AS VARCHAR)
+,'0.2'
+,'0.2'
+,'0.05'
+,'1'
+,'2'
+,'4'
+,cast(((1-(1*c."Art")-c."StrengthRatio")/SQRT((POWER(1,2) * POWER(c."Art",2)*POWER(0.2,2))+(POWER(1-(1*c."Art"),2))*(POWER(0.2,2))+(POWER(c."StrengthRatio",2)*POWER(0.05,2))))   AS VARCHAR)
+,cast(((1-(2*c."Art")-c."StrengthRatio")/SQRT((POWER(2,2) * POWER(c."Art",2)*POWER(0.2,2))+(POWER(1-(2*c."Art"),2))*(POWER(0.2,2))+(POWER(c."StrengthRatio",2)*POWER(0.05,2))))   AS VARCHAR)
+,cast(((1-(4*c."Art")-c."StrengthRatio")/SQRT((POWER(4,2) * POWER(c."Art",2)*POWER(0.2,2))+(POWER(1-(4*c."Art"),2))*(POWER(0.2,2))+(POWER(c."StrengthRatio",2)*POWER(0.05,2))))   AS VARCHAR)
+,'0'
+,'0'
+,'0'
+,cast(c."DamageFactor"   AS VARCHAR)
+,cast(ROUND(((3.06* (0.00001)) * c."DamageFactor"),5) AS VARCHAR)
+,cast(c."POF"   AS VARCHAR)
+,cast(p."EffectiveThk_ETHK" - p."EffectiveMinReqThk_EMRT"   AS VARCHAR)
+,'0' --cast((p."EffectiveThk_ETHK" - p."EffectiveMinReqThk_EMRT") / c."EffectiveCR"   AS VARCHAR)
+,'0' --cast(((p."EffectiveThk_ETHK" - p."EffectiveMinReqThk_EMRT") / c."EffectiveCR")/2   AS VARCHAR)
+,'0'
+,cast(c."POF"   AS VARCHAR)
+,cast(c."UseMeasuredLCR"   AS VARCHAR)
+,cast(c."UseMeasuredSCR"   AS VARCHAR)
+,cast(c."TheoriticalCR"   AS VARCHAR)
+,cast(c."MeasuredLCR"   AS VARCHAR)
+,cast(c."MeasuredSCR"   AS VARCHAR)
+,NOW()
+,'SYSADMIN'
+FROM "PipeMaster" p
+INNER JOIN "POF_EC" c ON  c."PipeMasterID" = p."PipeMasterID";
